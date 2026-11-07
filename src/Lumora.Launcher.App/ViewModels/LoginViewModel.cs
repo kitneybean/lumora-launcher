@@ -11,6 +11,8 @@ public partial class LoginViewModel(AppServices services, Action<AccountSession>
 {
     public bool IsDemo => services.IsDemo;
 
+    public Appearance Appearance => services.Appearance;
+
     public string ServerUrl => services.Settings.AuthServerUrl;
 
     [ObservableProperty]

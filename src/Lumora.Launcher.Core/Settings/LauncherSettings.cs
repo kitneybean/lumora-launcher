@@ -89,6 +89,12 @@ public sealed class LauncherSettings
     /// <summary>"system", "light" or "dark".</summary>
     public string Theme { get; set; } = "dark";
 
+    /// <summary>Pixel-art space scene behind the pages.</summary>
+    public bool ShowBackground { get; set; } = true;
+
+    /// <summary>Twinkling stars and shooting stars on the background.</summary>
+    public bool AnimateBackground { get; set; } = true;
+
     public LauncherVisibility OnGameStart { get; set; } = LauncherVisibility.Minimize;
 
     public bool ShowGameConsole { get; set; }

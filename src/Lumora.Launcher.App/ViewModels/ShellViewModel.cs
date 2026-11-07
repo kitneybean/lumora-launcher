@@ -46,6 +46,7 @@ public partial class ShellViewModel : ViewModelBase
     public AccountSession Session { get; }
     public string PlayerName => Session.PlayerName;
     public bool IsDemo => _services.IsDemo;
+    public Appearance Appearance => _services.Appearance;
     public string Version => typeof(ShellViewModel).Assembly.GetName().Version?.ToString(3) ?? "0.1.0";
 
     public ServersViewModel Servers { get; }

@@ -43,6 +43,22 @@
                                 <Separator Classes="thin" />
                                 <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                     <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Космический фон" />
+                                        <TextBlock Classes="muted" Text="Пиксельная планета и звёзды за страницами." />
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowBackground}" OnContent="" OffContent="" />
+                                </Grid>
+                                <Separator Classes="thin" />
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24" IsEnabled="{Binding ShowBackground}">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Анимация фона" />
+                                        <TextBlock Classes="muted" Text="Мерцание звёзд и падающие звёзды." />
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding AnimateBackground}" OnContent="" OffContent="" />
+                                </Grid>
+                                <Separator Classes="thin" />
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
                                         <TextBlock Classes="h3" Text="Язык" />
                                         <TextBlock Classes="muted" Text="Другие языки появятся позже." />
                                     </StackPanel>

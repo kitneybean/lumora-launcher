@@ -2,12 +2,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Lumora.Launcher.App.ViewModels"
              xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:c="using:Lumora.Launcher.App.Controls"
              x:Class="Lumora.Launcher.App.Views.LoginView"
              x:DataType="vm:LoginViewModel">
 
     <Grid ColumnDefinitions="5*,6*">
         <!-- Brand panel -->
         <Border Background="{DynamicResource Lumora.Sidebar}" BorderBrush="{DynamicResource Lumora.Border}" BorderThickness="0,0,1,0">
+          <Panel>
+            <c:SpaceBackdrop Seed="21" Opacity="{DynamicResource Lumora.BackdropOpacity}"
+                             IsVisible="{Binding Appearance.ShowBackground}" IsAnimated="{Binding Appearance.AnimateBackground}"
+                             PlanetCenter="1.08,1.12" PlanetSize="0.62" MoonCenter="0.8,0.16" />
+            <Border IsHitTestVisible="False" IsVisible="{Binding Appearance.ShowBackground}"
+                    Background="{DynamicResource Lumora.BackdropScrim}" />
             <Grid RowDefinitions="*,Auto" Margin="48,72,48,36">
                 <StackPanel VerticalAlignment="Center" Spacing="28" MaxWidth="380" HorizontalAlignment="Left">
                     <StackPanel Orientation="Horizontal" Spacing="14">
@@ -52,6 +59,7 @@
                     <TextBlock Text="Демо-режим: подойдёт любой логин и пароль" />
                 </Border>
             </Grid>
+          </Panel>
         </Border>
 
         <!-- Form -->

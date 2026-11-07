@@ -25,6 +25,12 @@
             <SolidColorBrush x:Key="Lumora.Info" Color="#6EA8FE" />
             <SolidColorBrush x:Key="Lumora.InfoSoft" Color="#1F6EA8FE" />
             <SolidColorBrush x:Key="Lumora.Overlay" Color="#99000000" />
+            <x:Double x:Key="Lumora.BackdropOpacity">1</x:Double>
+            <LinearGradientBrush x:Key="Lumora.BackdropScrim" StartPoint="0%,0%" EndPoint="0%,100%">
+                <GradientStop Offset="0" Color="#990D0F13" />
+                <GradientStop Offset="0.35" Color="#330D0F13" />
+                <GradientStop Offset="1" Color="#000D0F13" />
+            </LinearGradientBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="Lumora.Bg" Color="#F4F6F8" />
@@ -50,6 +56,12 @@
             <SolidColorBrush x:Key="Lumora.Info" Color="#2F6FDB" />
             <SolidColorBrush x:Key="Lumora.InfoSoft" Color="#1A2F6FDB" />
             <SolidColorBrush x:Key="Lumora.Overlay" Color="#66000000" />
+            <x:Double x:Key="Lumora.BackdropOpacity">1</x:Double>
+            <LinearGradientBrush x:Key="Lumora.BackdropScrim" StartPoint="0%,0%" EndPoint="0%,100%">
+                <GradientStop Offset="0" Color="#F2F4F6F8" />
+                <GradientStop Offset="0.5" Color="#D9F4F6F8" />
+                <GradientStop Offset="1" Color="#B3F4F6F8" />
+            </LinearGradientBrush>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 

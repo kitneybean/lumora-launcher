@@ -22,6 +22,11 @@ public sealed class AppServices
         Status = status;
         IsDemo = isDemo;
         Settings = store.LoadGlobal();
+        Appearance = new Appearance
+        {
+            ShowBackground = Settings.ShowBackground,
+            AnimateBackground = Settings.AnimateBackground,
+        };
         _saveTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(400) };
         _saveTimer.Tick += (_, _) =>
         {
@@ -35,6 +40,7 @@ public sealed class AppServices
     public SettingsStore Store { get; }
     public LauncherPaths Paths => Store.Paths;
     public LauncherSettings Settings { get; }
+    public Appearance Appearance { get; }
     public ILumoraApi Api { get; }
     public IGameService Game { get; }
     public IServerStatusService Status { get; }

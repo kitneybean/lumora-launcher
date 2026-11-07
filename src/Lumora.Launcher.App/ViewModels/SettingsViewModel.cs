@@ -26,6 +26,8 @@ public partial class SettingsViewModel : ViewModelBase
         SelectedTheme = Find(Themes, S.Theme);
         SelectedVisibility = Find(Visibilities, S.OnGameStart);
         ShowGameConsole = S.ShowGameConsole;
+        ShowBackground = S.ShowBackground;
+        AnimateBackground = S.AnimateBackground;
         DownloadThreads = S.DownloadThreads;
         ProxyUrl = S.ProxyUrl ?? "";
         DataDirectory = S.DataDirectory ?? "";
@@ -66,6 +68,12 @@ public partial class SettingsViewModel : ViewModelBase
     public partial bool ShowGameConsole { get; set; }
 
     [ObservableProperty]
+    public partial bool ShowBackground { get; set; }
+
+    [ObservableProperty]
+    public partial bool AnimateBackground { get; set; }
+
+    [ObservableProperty]
     public partial decimal DownloadThreads { get; set; }
 
     [ObservableProperty]
@@ -90,6 +98,8 @@ public partial class SettingsViewModel : ViewModelBase
 
     partial void OnSelectedVisibilityChanged(Choice<LauncherVisibility> value) => Save(() => S.OnGameStart = value.Value);
     partial void OnShowGameConsoleChanged(bool value) => Save(() => S.ShowGameConsole = value);
+    partial void OnShowBackgroundChanged(bool value) => Save(() => S.ShowBackground = _services.Appearance.ShowBackground = value);
+    partial void OnAnimateBackgroundChanged(bool value) => Save(() => S.AnimateBackground = _services.Appearance.AnimateBackground = value);
     partial void OnDownloadThreadsChanged(decimal value) => Save(() => S.DownloadThreads = (int)value);
     partial void OnProxyUrlChanged(string value) => Save(() => S.ProxyUrl = string.IsNullOrWhiteSpace(value) ? null : value.Trim());
     partial void OnDataDirectoryChanged(string value) => Save(() => S.DataDirectory = string.IsNullOrWhiteSpace(value) ? null : value.Trim());
