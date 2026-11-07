@@ -18,6 +18,9 @@ var server = Arg("--server");
 var dataDir = Arg("--data", Path.Combine(Path.GetTempPath(), "lumora-smoke"));
 var seconds = int.Parse(Arg("--seconds", "180"));
 var keepRunning = args.Contains("--keep-running");
+// --join: the build's server must have "auto-connect" on; wait until the player is in the world.
+var join = args.Contains("--join");
+var joined = false;
 
 var store = new SettingsStore(new LauncherPaths(dataDir));
 var settings = store.LoadGlobal();
@@ -66,10 +69,17 @@ try
         if (line.Contains($"Setting user: {session.PlayerName}"))
             sawUser = true;
         // Sound engine start is one of the last steps before the title screen.
+        // The server sends advancements right after login; chat is not always printed to stdout.
+        if (join && (line.Contains("[minecraft/AdvancementTree]: Loaded") || line.Contains($"{session.PlayerName} joined the game")))
+        {
+            joined = true;
+            if (!keepRunning)
+                cts.CancelAfter(TimeSpan.FromSeconds(20)); // let the skin download
+        }
         if (line.Contains("Sound engine started") || line.Contains("Created: ") && line.Contains("atlas"))
         {
             reachedMenu = true;
-            if (!keepRunning)
+            if (!keepRunning && !join)
                 cts.CancelAfter(TimeSpan.FromSeconds(8));
         }
     }, cts.Token);
@@ -80,11 +90,11 @@ catch (OperationCanceledException)
     Console.WriteLine("[smoke] game stopped by the smoke test");
 }
 
-Console.WriteLine($"[smoke] authlib-injector seen: {sawAuthlib}, user set: {sawUser}, reached menu: {reachedMenu}");
+Console.WriteLine($"[smoke] authlib-injector seen: {sawAuthlib}, user set: {sawUser}, reached menu: {reachedMenu}, joined: {(join ? joined : "n/a")}");
 var serversDat = Path.Combine(store.Paths.InstanceDirectory(settings, target.Build.Id), "servers.dat");
 var entries = Lumora.Launcher.Core.GameServers.ServersDatFile.Read(serversDat);
 Console.WriteLine($"[smoke] servers.dat: {string.Join(", ", entries.Select(e => $"{e.Name} = {e.Address}"))}");
-return sawAuthlib && sawUser && reachedMenu ? 0 : 1;
+return sawAuthlib && sawUser && reachedMenu && (!join || joined) ? 0 : 1;
 
 internal sealed class SyncProgress<T>(Action<T> action) : IProgress<T>
 {

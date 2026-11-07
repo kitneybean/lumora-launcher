@@ -141,7 +141,8 @@ public sealed class GameService(LumoraApiClient api, SettingsStore store, Func<L
 
         var gameArgs = new List<MArgument>();
         if (game.AutoConnect == true || server.AutoConnect)
-            gameArgs.Add(new MArgument(["--quickPlayMultiplayer", $"{server.Address}:{server.Port}"]));
+            // Same form as in servers.dat ("host" for the default port), so the game does not add a duplicate entry.
+            gameArgs.Add(new MArgument(["--quickPlayMultiplayer", server.Port == 25565 ? server.Address : $"{server.Address}:{server.Port}"]));
 
         var option = new MLaunchOption
         {
