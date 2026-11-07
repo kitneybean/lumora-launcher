@@ -27,9 +27,15 @@
             <SolidColorBrush x:Key="Lumora.Overlay" Color="#99000000" />
             <x:Double x:Key="Lumora.BackdropOpacity">1</x:Double>
             <LinearGradientBrush x:Key="Lumora.BackdropScrim" StartPoint="0%,0%" EndPoint="0%,100%">
-                <GradientStop Offset="0" Color="#990D0F13" />
-                <GradientStop Offset="0.35" Color="#330D0F13" />
-                <GradientStop Offset="1" Color="#000D0F13" />
+                <GradientStop Offset="0" Color="#D90D0F13" />
+                <GradientStop Offset="0.3" Color="#A60D0F13" />
+                <GradientStop Offset="1" Color="#730D0F13" />
+            </LinearGradientBrush>
+            <!-- Login brand panel: darker on the left where the text is. -->
+            <LinearGradientBrush x:Key="Lumora.BackdropScrimSide" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Offset="0" Color="#F00D0F13" />
+                <GradientStop Offset="0.6" Color="#C70D0F13" />
+                <GradientStop Offset="1" Color="#800D0F13" />
             </LinearGradientBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
@@ -61,6 +67,10 @@
                 <GradientStop Offset="0" Color="#F2F4F6F8" />
                 <GradientStop Offset="0.5" Color="#D9F4F6F8" />
                 <GradientStop Offset="1" Color="#B3F4F6F8" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="Lumora.BackdropScrimSide" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Offset="0" Color="#F7F4F6F8" />
+                <GradientStop Offset="1" Color="#CCF4F6F8" />
             </LinearGradientBrush>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>

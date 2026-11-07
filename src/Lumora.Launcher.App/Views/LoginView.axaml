@@ -14,7 +14,7 @@
                              IsVisible="{Binding Appearance.ShowBackground}" IsAnimated="{Binding Appearance.AnimateBackground}"
                              PlanetCenter="1.08,1.12" PlanetSize="0.62" MoonCenter="0.8,0.16" />
             <Border IsHitTestVisible="False" IsVisible="{Binding Appearance.ShowBackground}"
-                    Background="{DynamicResource Lumora.BackdropScrim}" />
+                    Background="{DynamicResource Lumora.BackdropScrimSide}" />
             <Grid RowDefinitions="*,Auto" Margin="48,72,48,36">
                 <StackPanel VerticalAlignment="Center" Spacing="28" MaxWidth="380" HorizontalAlignment="Left">
                     <StackPanel Orientation="Horizontal" Spacing="14">
