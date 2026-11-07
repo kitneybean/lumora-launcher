@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!--
+      API contracts live in the lumora-auth repository. Both repositories are expected
+      side by side (Minecraft/lumora-auth, Minecraft/lumora-launcher); CI checks them out the same way.
+      Override with: dotnet build -p:LumoraContractsProject=path/to/Lumora.Contracts.csproj
+    -->
+    <LumoraContractsProject Condition="'$(LumoraContractsProject)' == ''">$(MSBuildThisFileDirectory)..\..\..\lumora-auth\src\Lumora.Contracts\Lumora.Contracts.csproj</LumoraContractsProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(LumoraContractsProject)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CmlLib.Core" Version="4.1.0" />
+    <PackageReference Include="CmlLib.Core.Installer.NeoForge" Version="4.0.1" />
+    <PackageReference Include="fNbt" Version="2.1.0" />
+  </ItemGroup>
+
+</Project>

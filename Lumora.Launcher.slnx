@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Lumora.Launcher.App/Lumora.Launcher.App.csproj" />
+    <Project Path="src/Lumora.Launcher.Core/Lumora.Launcher.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Lumora.Launcher.Tests/Lumora.Launcher.Tests.csproj" />
+  </Folder>
+</Solution>
