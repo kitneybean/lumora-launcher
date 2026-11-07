@@ -61,12 +61,43 @@ public partial class LoginViewModel(AppServices services, Action<AccountSession>
         }
         catch (Exception)
         {
-            Error = "Сервер авторизации недоступен. Проверьте подключение к интернету.";
+            Error = $"Не удалось связаться с {ServerUrl}. Проверьте интернет или адрес сервера внизу.";
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    [ObservableProperty]
+    public partial bool IsEditingServer { get; set; }
+
+    [ObservableProperty]
+    public partial string ServerUrlEdit { get; set; } = "";
+
+    [RelayCommand]
+    private void EditServer()
+    {
+        ServerUrlEdit = ServerUrl;
+        IsEditingServer = true;
+    }
+
+    [RelayCommand]
+    private void SaveServer()
+    {
+        var url = ServerUrlEdit.Trim().TrimEnd('/');
+        if (!url.Contains("://", StringComparison.Ordinal))
+            url = "https://" + url;
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("https" or "http"))
+        {
+            Error = "Адрес сервера должен выглядеть как https://mc.example.com";
+            return;
+        }
+        services.Settings.AuthServerUrl = url;
+        services.SaveSettingsSoon();
+        IsEditingServer = false;
+        Error = null;
+        OnPropertyChanged(nameof(ServerUrl));
     }
 
     [RelayCommand]

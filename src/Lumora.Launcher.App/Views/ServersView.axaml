@@ -28,7 +28,8 @@
                 <StackPanel IsVisible="{Binding LoadError, Converter={x:Static ObjectConverters.IsNotNull}}"
                             HorizontalAlignment="Center" Margin="0,80,0,0" Spacing="12">
                     <mi:MaterialIcon Kind="CloudOffOutline" Width="40" Height="40" Foreground="{DynamicResource Lumora.TextMuted}" />
-                    <TextBlock Classes="h2" Text="{Binding LoadError}" HorizontalAlignment="Center" />
+                    <TextBlock Classes="h2" Text="{Binding LoadError}" HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" MaxWidth="520" />
                     <Button Classes="primary" HorizontalAlignment="Center" Content="Повторить" Command="{Binding RefreshCommand}" />
                 </StackPanel>
                 <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" Margin="0,80,0,0" Spacing="8">

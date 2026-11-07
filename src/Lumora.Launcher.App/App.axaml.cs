@@ -28,6 +28,7 @@ public partial class App : Application
         {
             var args = desktop.Args ?? [];
             var root = Option(args, "--data") ?? Environment.GetEnvironmentVariable("LUMORA_HOME") ?? LauncherPaths.DefaultRoot;
+            ApplyBuiltInAuthServer();
             var store = new SettingsStore(new LauncherPaths(root));
             var services = args.Contains("--demo") ? CreateDemo(store) : CreateReal(store);
             services.ApplyTheme();
@@ -57,6 +58,15 @@ public partial class App : Application
             Sessions = new SessionStore(Path.Combine(store.Paths.Root, "session.dat")),
         };
         return services;
+    }
+
+    /// <summary>Uses the auth server baked into this build (LumoraAuthServer) as the default.</summary>
+    private static void ApplyBuiltInAuthServer()
+    {
+        var url = System.Reflection.CustomAttributeExtensions.GetCustomAttributes<System.Reflection.AssemblyMetadataAttribute>(typeof(App).Assembly)
+            .FirstOrDefault(a => a.Key == "LumoraAuthServer")?.Value;
+        if (!string.IsNullOrWhiteSpace(url))
+            LauncherSettings.DefaultAuthServerUrl = url.TrimEnd('/');
     }
 
     private static string? Option(string[] args, string name)

@@ -64,6 +64,13 @@ Pump(300);
 Shot("01-login");
 
 var login = (LoginViewModel)root.CurrentScreen;
+
+// 1b. Long error must wrap inside its box.
+login.Error = "Не удалось связаться с https://mc.4ntares.ru. Проверьте интернет или адрес сервера внизу.";
+Pump(200);
+Shot("01b-login-error");
+login.Error = null;
+
 login.Login = "Steve";
 login.Password = "demo";
 login.LoginCommand.Execute(null);

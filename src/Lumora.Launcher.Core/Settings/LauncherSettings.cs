@@ -78,8 +78,14 @@ public sealed class GameSettings
 /// <summary>Global launcher settings (settings.json).</summary>
 public sealed class LauncherSettings
 {
+    /// <summary>Default auth server, baked into release builds (-p:LumoraAuthServer=https://...).</summary>
+    public static string DefaultAuthServerUrl { get; set; } = "https://mc.4ntares.ru";
+
+    /// <summary>Address of the first dev builds; replaced by the built-in server on load.</summary>
+    public const string LegacyDevAuthServerUrl = "https://localhost:7443";
+
     /// <summary>Auth server base URL, e.g. https://auth.example.com.</summary>
-    public string AuthServerUrl { get; set; } = "https://localhost:7443";
+    public string AuthServerUrl { get; set; } = DefaultAuthServerUrl;
 
     /// <summary>Root folder for instances, runtimes and cache; null = default per-OS location.</summary>
     public string? DataDirectory { get; set; }

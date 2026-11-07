@@ -8,8 +8,16 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>Lumora</AssemblyName>
     <RootNamespace>Lumora.Launcher.App</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
   </PropertyGroup>
+
+  <!-- Auth server the launcher connects to out of the box: -p:LumoraAuthServer=https://auth.example.com -->
+  <PropertyGroup>
+    <LumoraAuthServer Condition="'$(LumoraAuthServer)' == ''">https://mc.4ntares.ru</LumoraAuthServer>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="LumoraAuthServer" Value="$(LumoraAuthServer)" />
+  </ItemGroup>
 
   <!-- Release builds bake in the GitHub repository used for self-update: -p:LumoraUpdateRepo=owner/name -->
   <ItemGroup Condition="'$(LumoraUpdateRepo)' != ''">

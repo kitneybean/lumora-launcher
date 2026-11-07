@@ -22,6 +22,9 @@ public sealed class AppServices
         Status = status;
         IsDemo = isDemo;
         Settings = store.LoadGlobal();
+        // First builds pointed at a local dev server; switch such installs to the real one.
+        if (string.IsNullOrWhiteSpace(Settings.AuthServerUrl) || Settings.AuthServerUrl.TrimEnd('/') == LauncherSettings.LegacyDevAuthServerUrl)
+            Settings.AuthServerUrl = LauncherSettings.DefaultAuthServerUrl;
         Appearance = new Appearance
         {
             ShowBackground = Settings.ShowBackground,

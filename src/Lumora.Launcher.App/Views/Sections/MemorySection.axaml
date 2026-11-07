@@ -27,10 +27,10 @@
                     </Grid>
                 </StackPanel>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" IsVisible="{Binding HasMemoryWarning}">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <mi:MaterialIcon Kind="AlertOutline" Width="16" Height="16" Foreground="{DynamicResource Lumora.Warning}" />
-                        <TextBlock Text="{Binding MemoryWarning}" FontSize="12.5" Foreground="{DynamicResource Lumora.Warning}" TextWrapping="Wrap" />
-                    </StackPanel>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                        <mi:MaterialIcon Kind="AlertOutline" Width="16" Height="16" VerticalAlignment="Top" Foreground="{DynamicResource Lumora.Warning}" />
+                        <TextBlock Grid.Column="1" Text="{Binding MemoryWarning}" FontSize="12.5" Foreground="{DynamicResource Lumora.Warning}" TextWrapping="Wrap" />
+                    </Grid>
                 </Grid>
                 <Button Classes="ghost" HorizontalAlignment="Left" Command="{Binding UseRecommendedMemoryCommand}" IsVisible="{Binding HasRecommended}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
