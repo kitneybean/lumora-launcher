@@ -1,0 +1,143 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:s="using:Lumora.Launcher.App.Views.Sections"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="32,4,32,8" Spacing="4">
+            <TextBlock Classes="h1" Text="Настройки" />
+            <TextBlock Classes="secondary" Text="Действуют для всех сборок. Отдельную сборку можно настроить на её карточке. Изменения сохраняются сами." />
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Classes="settings" Margin="20,0,0,0">
+            <TabItem Header="Java">
+                <ScrollViewer Padding="12,4,32,28">
+                    <s:JavaSection DataContext="{Binding Game}" MaxWidth="820" HorizontalAlignment="Left" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Память">
+                <ScrollViewer Padding="12,4,32,28">
+                    <s:MemorySection DataContext="{Binding Game}" MaxWidth="820" HorizontalAlignment="Left" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Игра">
+                <ScrollViewer Padding="12,4,32,28">
+                    <s:GameSection DataContext="{Binding Game}" MaxWidth="820" HorizontalAlignment="Left" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Лаунчер">
+                <ScrollViewer Padding="12,4,32,28">
+                    <StackPanel Spacing="16" MaxWidth="820" HorizontalAlignment="Left">
+                        <Border Classes="section">
+                            <StackPanel>
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Тема" />
+                                        <TextBlock Classes="muted" Text="Оформление лаунчера." />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" Width="230" ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme}" DisplayMemberBinding="{Binding Title}" />
+                                </Grid>
+                                <Separator Classes="thin" />
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Язык" />
+                                        <TextBlock Classes="muted" Text="Другие языки появятся позже." />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" Width="230" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage, Mode=OneWay}" DisplayMemberBinding="{Binding Title}" />
+                                </Grid>
+                                <Separator Classes="thin" />
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Когда игра запущена" />
+                                        <TextBlock Classes="muted" Text="Что делать с окном лаунчера." />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" Width="230" ItemsSource="{Binding Visibilities}" SelectedItem="{Binding SelectedVisibility}" DisplayMemberBinding="{Binding Title}" />
+                                </Grid>
+                                <Separator Classes="thin" />
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Показывать консоль игры" />
+                                        <TextBlock Classes="muted" Text="Открывать вкладку «Консоль» при запуске." />
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowGameConsole}" OnContent="" OffContent="" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="section">
+                            <StackPanel>
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Потоки загрузки" />
+                                        <TextBlock Classes="muted" Text="Сколько файлов качать одновременно." />
+                                    </StackPanel>
+                                    <NumericUpDown Grid.Column="1" Value="{Binding DownloadThreads}" Minimum="1" Maximum="32" Width="120" FormatString="0" />
+                                </Grid>
+                                <Separator Classes="thin" />
+                                <StackPanel Spacing="6" Margin="0,10">
+                                    <TextBlock Classes="h3" Text="Прокси" />
+                                    <TextBox Text="{Binding ProxyUrl}" PlaceholderText="http://127.0.0.1:8080 — оставьте пустым, если не нужен" />
+                                </StackPanel>
+                                <Separator Classes="thin" />
+                                <StackPanel Spacing="6" Margin="0,10">
+                                    <TextBlock Classes="h3" Text="Папка для игровых данных" />
+                                    <TextBlock Classes="muted" Text="Сборки, Java и кэш. Перенесите на диск с большим объёмом, если нужно." />
+                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                        <TextBox Text="{Binding DataDirectory}" PlaceholderText="{Binding DefaultDataDirectory}" />
+                                        <Button Grid.Column="1" Content="Обзор…" Command="{Binding BrowseDataDirectoryCommand}" />
+                                        <Button Grid.Column="2" Classes="ghost" Content="По умолчанию" Command="{Binding ResetDataDirectoryCommand}" />
+                                    </Grid>
+                                </StackPanel>
+                                <Separator Classes="thin" />
+                                <StackPanel Spacing="6" Margin="0,10,0,4">
+                                    <TextBlock Classes="h3" Text="Сервер авторизации" />
+                                    <TextBox Text="{Binding AuthServerUrl}" PlaceholderText="https://auth.example.com" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Обслуживание">
+                <ScrollViewer Padding="12,4,32,28">
+                    <StackPanel Spacing="12" MaxWidth="820" HorizontalAlignment="Left">
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                                <mi:MaterialIcon Kind="FolderOutline" Width="22" Height="22" Foreground="{DynamicResource Lumora.TextSecondary}" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Classes="h3" Text="Папка лаунчера" />
+                                    <TextBlock Classes="muted" Text="Сборки, Java, кэш и настройки." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Открыть" Command="{Binding OpenDataFolderCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                                <mi:MaterialIcon Kind="Broom" Width="22" Height="22" Foreground="{DynamicResource Lumora.TextSecondary}" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Classes="h3" Text="Очистить кэш" />
+                                    <TextBlock Classes="muted" Text="Удалит временные файлы загрузок. Сборки и миры не пострадают." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Очистить" Command="{Binding ClearCacheCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="16">
+                                <mi:MaterialIcon Kind="FileDocumentOutline" Width="22" Height="22" Foreground="{DynamicResource Lumora.TextSecondary}" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Classes="h3" Text="Логи" />
+                                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="Если что-то не работает, отправьте архив логов администратору." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Classes="ghost" Content="Открыть папку" Command="{Binding OpenLogsFolderCommand}" VerticalAlignment="Center" />
+                                <Button Grid.Column="3" Content="Сохранить архив" Command="{Binding ExportLogsCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.Sections.MemorySection"
+             x:DataType="vm:GameSettingsEditorViewModel">
+    <StackPanel Spacing="16">
+        <Border Classes="section">
+            <StackPanel Spacing="14">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="3">
+                        <TextBlock Classes="h3" Text="Максимум памяти для игры" />
+                        <TextBlock Classes="muted">
+                            <Run Text="{Binding SystemMemoryText}" />
+                            <Run Text="{Binding RecommendedText}" />
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{Binding MaxMemoryText}" FontSize="22" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Lumora.AccentText}" VerticalAlignment="Center" />
+                </Grid>
+                <StackPanel Spacing="2">
+                    <Slider Minimum="1024" Maximum="{Binding MemoryMaximum}" Value="{Binding MaxMemoryMb}"
+                            TickFrequency="256" IsSnapToTickEnabled="True" SmallChange="256" LargeChange="1024" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="muted" Text="1 ГБ" />
+                        <TextBlock Grid.Column="1" Classes="muted" Text="{Binding MemoryMaximumText}" />
+                    </Grid>
+                </StackPanel>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" IsVisible="{Binding HasMemoryWarning}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <mi:MaterialIcon Kind="AlertOutline" Width="16" Height="16" Foreground="{DynamicResource Lumora.Warning}" />
+                        <TextBlock Text="{Binding MemoryWarning}" FontSize="12.5" Foreground="{DynamicResource Lumora.Warning}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
+                <Button Classes="ghost" HorizontalAlignment="Left" Command="{Binding UseRecommendedMemoryCommand}" IsVisible="{Binding HasRecommended}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <mi:MaterialIcon Kind="AutoFix" Width="16" Height="16" />
+                        <TextBlock Text="Как рекомендует сборка" />
+                    </StackPanel>
+                </Button>
+                <Separator Classes="thin" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                    <StackPanel Spacing="3">
+                        <TextBlock Classes="h3" Text="Минимум памяти" />
+                        <TextBlock Classes="muted" Text="Сколько Java займёт сразу при запуске (-Xms)." />
+                    </StackPanel>
+                    <ComboBox Grid.Column="1" Width="140" VerticalAlignment="Center"
+                              ItemsSource="{Binding MinMemoryChoices}" SelectedItem="{Binding SelectedMinMemory}"
+                              DisplayMemberBinding="{Binding Title}" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Classes="section">
+            <StackPanel Spacing="12">
+                <StackPanel Spacing="3">
+                    <TextBlock Classes="h3" Text="Дополнительные аргументы JVM" />
+                    <TextBlock Classes="muted" TextWrapping="Wrap"
+                               Text="По одному на строку. Добавляются после обязательных аргументов сборки — их изменить нельзя." />
+                </StackPanel>
+                <TextBox Text="{Binding JvmArguments}" AcceptsReturn="True" MinHeight="80" TextWrapping="NoWrap"
+                         FontFamily="{StaticResource Lumora.Mono}" FontSize="12.5" PlaceholderText="-XX:+UseZGC" />
+                <StackPanel Spacing="3" Margin="0,6,0,0">
+                    <TextBlock Classes="h3" Text="Переменные окружения" />
+                    <TextBlock Classes="muted" Text="ИМЯ=значение, по одной на строку." />
+                </StackPanel>
+                <TextBox Text="{Binding EnvironmentVariables}" AcceptsReturn="True" MinHeight="60" TextWrapping="NoWrap"
+                         FontFamily="{StaticResource Lumora.Mono}" FontSize="12.5" PlaceholderText="__GL_THREADED_OPTIMIZATIONS=1" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

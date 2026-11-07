@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:c="using:Lumora.Launcher.App.Controls"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.ShellView"
+             x:DataType="vm:ShellViewModel">
+
+    <Grid ColumnDefinitions="236,*">
+        <!-- Sidebar -->
+        <Border Background="{DynamicResource Lumora.Sidebar}"
+                BorderBrush="{DynamicResource Lumora.Border}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <!-- Logo (also the window drag area) -->
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10"
+                            Margin="20,18,20,22" IsHitTestVisible="False">
+                    <Path Data="{StaticResource Lumora.LogoGeometry}" Stroke="{DynamicResource Lumora.Accent}"
+                          StrokeThickness="2" StrokeJoin="Round" Width="24" Height="24" Stretch="Uniform" />
+                    <TextBlock Text="Lumora" FontSize="19" FontWeight="Bold" VerticalAlignment="Center"
+                               Foreground="{DynamicResource Lumora.Text}" />
+                </StackPanel>
+
+                <!-- Account -->
+                <StackPanel DockPanel.Dock="Bottom" Margin="12,0,12,14" Spacing="10">
+                    <Border Background="{DynamicResource Lumora.Surface}" BorderBrush="{DynamicResource Lumora.Border}"
+                            BorderThickness="1" CornerRadius="{StaticResource Lumora.Radius}" Padding="10">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                            <Border Width="38" Height="38" CornerRadius="7" ClipToBounds="True"
+                                    Background="{DynamicResource Lumora.SurfaceSunken}">
+                                <c:SkinPreview Mode="Head" Skin="{Binding SkinBitmap}" Margin="3"
+                                               PlaceholderBrush="{DynamicResource Lumora.BorderStrong}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                <TextBlock Text="{Binding PlayerName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource Lumora.Text}" />
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Ellipse Classes="status online" Width="7" Height="7" />
+                                    <TextBlock Classes="muted" Text="В сети" />
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Grid.Column="2" Classes="icon" Command="{Binding LogoutCommand}" ToolTip.Tip="Выйти из аккаунта">
+                                <mi:MaterialIcon Kind="Logout" />
+                            </Button>
+                        </Grid>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="4,0">
+                        <TextBlock Classes="muted" VerticalAlignment="Center">
+                            <Run Text="Lumora" />
+                            <Run Text="{Binding Version}" />
+                        </TextBlock>
+                        <Border Classes="pill warning" IsVisible="{Binding IsDemo}" ToolTip.Tip="API сервера ещё не подключено: данные и установка имитируются">
+                            <TextBlock Text="Демо-режим" />
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Navigation -->
+                <ListBox Classes="nav" Margin="12,0" ItemsSource="{Binding NavItems}" SelectedItem="{Binding SelectedNav}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:NavItem">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <mi:MaterialIcon Kind="{Binding Icon}" Width="19" Height="19" />
+                                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Medium" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Page -->
+        <Grid Grid.Column="1" RowDefinitions="44,*">
+            <TransitioningContentControl Grid.Row="1" Content="{Binding CurrentPage}">
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="0:0:0.12" />
+                </TransitioningContentControl.PageTransition>
+            </TransitioningContentControl>
+        </Grid>
+    </Grid>
+</UserControl>

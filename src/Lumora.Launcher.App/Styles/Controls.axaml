@@ -1,0 +1,242 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+
+    <!-- Typography -->
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Text}" />
+    </Style>
+    <Style Selector="TextBlock.h2">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Text}" />
+    </Style>
+    <Style Selector="TextBlock.h3">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Text}" />
+    </Style>
+    <Style Selector="TextBlock.secondary">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextMuted}" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextMuted}" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LetterSpacing" Value="0.6" />
+    </Style>
+    <Style Selector="TextBlock.error">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Danger}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- Card -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource Lumora.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Lumora.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.RadiusLarge}" />
+        <Setter Property="Padding" Value="18" />
+    </Style>
+    <Style Selector="Border.card.interactive">
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Border.card.interactive:pointerover">
+        <Setter Property="BorderBrush" Value="{DynamicResource Lumora.BorderStrong}" />
+        <Setter Property="Background" Value="{DynamicResource Lumora.SurfaceHover}" />
+    </Style>
+    <Style Selector="Border.section">
+        <Setter Property="Background" Value="{DynamicResource Lumora.Surface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Lumora.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.Radius}" />
+        <Setter Property="Padding" Value="18,16" />
+    </Style>
+
+    <!-- Pills -->
+    <Style Selector="Border.pill">
+        <Setter Property="Background" Value="{DynamicResource Lumora.SurfaceSunken}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Lumora.Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8,3" />
+    </Style>
+    <Style Selector="Border.pill > TextBlock, Border.pill StackPanel > TextBlock">
+        <Setter Property="FontSize" Value="11.5" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextSecondary}" />
+    </Style>
+    <Style Selector="Border.pill mi|MaterialIcon">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextMuted}" />
+    </Style>
+    <Style Selector="Border.pill.accent">
+        <Setter Property="Background" Value="{DynamicResource Lumora.AccentSoft}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Border.pill.accent > TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.AccentText}" />
+    </Style>
+    <Style Selector="Border.pill.warning">
+        <Setter Property="Background" Value="{DynamicResource Lumora.WarningSoft}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Border.pill.warning > TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Warning}" />
+    </Style>
+
+    <!-- Status dot -->
+    <Style Selector="Ellipse.status">
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="Fill" Value="{DynamicResource Lumora.TextMuted}" />
+    </Style>
+    <Style Selector="Ellipse.status.online">
+        <Setter Property="Fill" Value="{DynamicResource Lumora.Accent}" />
+    </Style>
+
+    <!-- Buttons -->
+    <Style Selector="Button">
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.RadiusSmall}" />
+        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{DynamicResource Lumora.Accent}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.OnAccent}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="18,9" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.AccentHover}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.OnAccent}" />
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.AccentPressed}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.OnAccent}" />
+    </Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.AccentSoft}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextSecondary}" />
+    </Style>
+    <Style Selector="Button.warning">
+        <Setter Property="Background" Value="{DynamicResource Lumora.WarningSoft}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Warning}" />
+    </Style>
+    <Style Selector="Button.ghost">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextSecondary}" />
+    </Style>
+    <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.SurfaceHover}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Text}" />
+    </Style>
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{DynamicResource Lumora.DangerSoft}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Danger}" />
+    </Style>
+    <Style Selector="Button.icon">
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextSecondary}" />
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.SurfaceHover}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Text}" />
+    </Style>
+    <Style Selector="Button.icon mi|MaterialIcon">
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="18" />
+    </Style>
+    <Style Selector="Button.link">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.AccentText}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+    <Style Selector="Button.link:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.AccentHover}" />
+    </Style>
+
+    <!-- Sidebar navigation -->
+    <Style Selector="ListBox.nav">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem">
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.RadiusSmall}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.TextSecondary}" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.SurfaceHover}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Text}" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.AccentSoft}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.AccentText}" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Lumora.AccentSoft}" />
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.AccentText}" />
+    </Style>
+
+    <!-- Inputs -->
+    <Style Selector="TextBox">
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.RadiusSmall}" />
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+    <Style Selector="ComboBox">
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.RadiusSmall}" />
+    </Style>
+    <Style Selector="NumericUpDown">
+        <Setter Property="CornerRadius" Value="{StaticResource Lumora.RadiusSmall}" />
+    </Style>
+
+    <!-- Progress -->
+    <Style Selector="ProgressBar">
+        <Setter Property="Foreground" Value="{DynamicResource Lumora.Accent}" />
+        <Setter Property="Background" Value="{DynamicResource Lumora.SurfaceSunken}" />
+        <Setter Property="MinHeight" Value="6" />
+        <Setter Property="Height" Value="6" />
+        <Setter Property="CornerRadius" Value="3" />
+    </Style>
+
+    <!-- Settings rows: label + description on the left, control on the right -->
+    <Style Selector="Grid.setting">
+        <Setter Property="Margin" Value="0,10" />
+    </Style>
+    <Style Selector="Separator.thin">
+        <Setter Property="Background" Value="{DynamicResource Lumora.Border}" />
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Margin" Value="0,4" />
+    </Style>
+
+    <!-- Tabs -->
+    <Style Selector="TabControl.settings">
+        <Setter Property="Padding" Value="0,12,0,0" />
+    </Style>
+    <Style Selector="TabControl.settings TabItem">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="MinHeight" Value="38" />
+        <Setter Property="Padding" Value="12,0" />
+    </Style>
+</Styles>

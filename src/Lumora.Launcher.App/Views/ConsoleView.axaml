@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.ConsoleView"
+             x:DataType="vm:ConsoleViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*" Margin="32,4,32,28">
+        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <StackPanel Spacing="4">
+                <TextBlock Classes="h1" Text="Консоль" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Ellipse Classes="status" Classes.online="{Binding IsGameRunning}" VerticalAlignment="Center" />
+                    <TextBlock Classes="secondary" Text="{Binding Title}" />
+                </StackPanel>
+            </StackPanel>
+            <Button Grid.Column="1" Classes="danger" Command="{Binding StopGameCommand}" IsVisible="{Binding IsGameRunning}" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <mi:MaterialIcon Kind="Stop" Width="18" Height="18" />
+                    <TextBlock Text="Остановить игру" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,10">
+            <ComboBox Width="190" ItemsSource="{Binding Filters}" SelectedItem="{Binding SelectedFilter}" DisplayMemberBinding="{Binding Title}"
+                      PlaceholderText="Все" />
+            <CheckBox Grid.Column="2" Content="Автопрокрутка" IsChecked="{Binding AutoScroll}" />
+            <Button Grid.Column="3" Classes="icon" Command="{Binding CopyCommand}" ToolTip.Tip="Скопировать">
+                <mi:MaterialIcon Kind="ContentCopy" />
+            </Button>
+            <Button Grid.Column="4" Classes="icon" Command="{Binding OpenLogsFolderCommand}" ToolTip.Tip="Папка логов">
+                <mi:MaterialIcon Kind="FolderOutline" />
+            </Button>
+            <Button Grid.Column="5" Classes="icon" Command="{Binding ClearCommand}" ToolTip.Tip="Очистить">
+                <mi:MaterialIcon Kind="DeleteSweepOutline" />
+            </Button>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{DynamicResource Lumora.SurfaceSunken}" BorderBrush="{DynamicResource Lumora.Border}"
+                BorderThickness="1" CornerRadius="{StaticResource Lumora.Radius}">
+            <Panel>
+                <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                    <mi:MaterialIcon Kind="Console" Width="36" Height="36" Foreground="{DynamicResource Lumora.TextMuted}" />
+                    <TextBlock Classes="secondary" Text="Здесь появится вывод игры после запуска." />
+                </StackPanel>
+                <ListBox x:Name="LogList" ItemsSource="{Binding Lines}" Background="Transparent" Padding="6"
+                         FontFamily="{StaticResource Lumora.Mono}" FontSize="12.5" SelectionMode="Multiple">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="8,2" />
+                            <Setter Property="MinHeight" Value="0" />
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:LogLine">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <TextBlock Text="{Binding Time}" Foreground="{DynamicResource Lumora.TextMuted}" />
+                                <Panel Grid.Column="1">
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="{DynamicResource Lumora.TextSecondary}"
+                                               IsVisible="{Binding Level, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static vm:LogLevel.Info}}" />
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="{DynamicResource Lumora.Warning}" IsVisible="{Binding IsWarning}" />
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="{DynamicResource Lumora.Danger}" IsVisible="{Binding IsError}" />
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Foreground="{DynamicResource Lumora.AccentText}" IsVisible="{Binding IsLauncher}" />
+                                </Panel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Panel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -6,4 +6,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Lumora.Launcher.Tests/Lumora.Launcher.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/Lumora.Launcher.Screenshots/Lumora.Launcher.Screenshots.csproj" />
+  </Folder>
 </Solution>

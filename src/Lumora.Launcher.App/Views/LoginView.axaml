@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+
+    <Grid ColumnDefinitions="5*,6*">
+        <!-- Brand panel -->
+        <Border Background="{DynamicResource Lumora.Sidebar}" BorderBrush="{DynamicResource Lumora.Border}" BorderThickness="0,0,1,0">
+            <Grid RowDefinitions="*,Auto" Margin="48,72,48,36">
+                <StackPanel VerticalAlignment="Center" Spacing="28" MaxWidth="380" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Path Data="{StaticResource Lumora.LogoGeometry}" Stroke="{DynamicResource Lumora.Accent}"
+                              StrokeThickness="2" StrokeJoin="Round" Width="44" Height="44" Stretch="Uniform" />
+                        <TextBlock Text="Lumora" FontSize="36" FontWeight="Bold" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Lumora.Text}" />
+                    </StackPanel>
+                    <TextBlock Text="Один клик — и ты уже на сервере." FontSize="18" TextWrapping="Wrap"
+                               Foreground="{DynamicResource Lumora.TextSecondary}" />
+                    <StackPanel Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Width="34" Height="34" CornerRadius="8" Background="{DynamicResource Lumora.AccentSoft}">
+                                <mi:MaterialIcon Kind="PackageVariantClosedCheck" Width="18" Height="18" Foreground="{DynamicResource Lumora.AccentText}" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="h3" Text="Сборка ставится сама" />
+                                <TextBlock Classes="muted" Text="Нужная версия, NeoForge, Java и моды" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Width="34" Height="34" CornerRadius="8" Background="{DynamicResource Lumora.AccentSoft}">
+                                <mi:MaterialIcon Kind="TshirtCrewOutline" Width="18" Height="18" Foreground="{DynamicResource Lumora.AccentText}" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="h3" Text="Твой скин видят все" />
+                                <TextBlock Classes="muted" Text="Без модов, прямо в игре" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Width="34" Height="34" CornerRadius="8" Background="{DynamicResource Lumora.AccentSoft}">
+                                <mi:MaterialIcon Kind="ServerNetwork" Width="18" Height="18" Foreground="{DynamicResource Lumora.AccentText}" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="h3" Text="Сервер уже в списке" />
+                                <TextBlock Classes="muted" Text="Ничего не нужно вводить вручную" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+                <Border Grid.Row="1" Classes="pill warning" HorizontalAlignment="Left" IsVisible="{Binding IsDemo}">
+                    <TextBlock Text="Демо-режим: подойдёт любой логин и пароль" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Form -->
+        <StackPanel Grid.Column="1" Width="360" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="14">
+            <StackPanel Spacing="6" Margin="0,0,0,10">
+                <TextBlock Classes="h1" Text="Вход" />
+                <TextBlock Classes="secondary" Text="Используйте аккаунт с сайта Lumora" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="muted" Text="Логин или e-mail" />
+                <TextBox x:Name="LoginBox" Text="{Binding Login}" PlaceholderText="steve@example.com">
+                    <TextBox.InnerLeftContent>
+                        <mi:MaterialIcon Kind="AccountOutline" Width="18" Height="18" Margin="10,0,0,0" Foreground="{DynamicResource Lumora.TextMuted}" />
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Classes="muted" Text="Пароль" />
+                <TextBox Text="{Binding Password}" PasswordChar="•" RevealPassword="{Binding RevealPassword}" PlaceholderText="••••••••">
+                    <TextBox.InnerLeftContent>
+                        <mi:MaterialIcon Kind="LockOutline" Width="18" Height="18" Margin="10,0,0,0" Foreground="{DynamicResource Lumora.TextMuted}" />
+                    </TextBox.InnerLeftContent>
+                    <TextBox.InnerRightContent>
+                        <ToggleButton IsChecked="{Binding RevealPassword}" Background="Transparent" Padding="8,4" Margin="0,0,2,0"
+                                      ToolTip.Tip="Показать пароль" Focusable="False">
+                            <mi:MaterialIcon Kind="EyeOutline" Width="17" Height="17" Foreground="{DynamicResource Lumora.TextMuted}" />
+                        </ToggleButton>
+                    </TextBox.InnerRightContent>
+                </TextBox>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <CheckBox IsChecked="{Binding Remember}" Content="Запомнить меня" />
+                <Button Grid.Column="1" Classes="link" Content="Забыли пароль?" Command="{Binding OpenForgotPasswordCommand}" />
+            </Grid>
+
+            <Border Background="{DynamicResource Lumora.DangerSoft}" CornerRadius="{StaticResource Lumora.RadiusSmall}" Padding="12,10"
+                    IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <mi:MaterialIcon Kind="AlertCircleOutline" Width="17" Height="17" Foreground="{DynamicResource Lumora.Danger}" />
+                    <TextBlock Classes="error" Text="{Binding Error}" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <StackPanel Spacing="8">
+                <Button Classes="primary" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Padding="0,11"
+                        IsDefault="True" Command="{Binding LoginCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Войти" IsVisible="{Binding !IsBusy}" />
+                        <TextBlock Text="Вход…" IsVisible="{Binding IsBusy}" />
+                    </StackPanel>
+                </Button>
+                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" Height="3" MinHeight="3" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" Margin="0,6,0,0">
+                <TextBlock Classes="secondary" Text="Нет аккаунта?" VerticalAlignment="Center" />
+                <Button Classes="link" Content="Зарегистрироваться" Command="{Binding OpenRegisterCommand}" />
+            </StackPanel>
+
+            <TextBlock Classes="muted" HorizontalAlignment="Center" Margin="0,20,0,0" Text="{Binding ServerUrl}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

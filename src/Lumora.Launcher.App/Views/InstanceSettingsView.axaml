@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:s="using:Lumora.Launcher.App.Views.Sections"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.InstanceSettingsView"
+             x:DataType="vm:InstanceSettingsViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="24,0,32,8">
+            <Button Classes="icon" Command="{Binding BackCommand}" ToolTip.Tip="Назад к серверам" VerticalAlignment="Center">
+                <mi:MaterialIcon Kind="ArrowLeft" Width="22" Height="22" />
+            </Button>
+            <StackPanel Grid.Column="1" Spacing="4">
+                <TextBlock Classes="h1" Text="{Binding Title}" />
+                <TextBlock Classes="secondary" Text="{Binding Subtitle}" />
+            </StackPanel>
+        </Grid>
+
+        <TabControl Grid.Row="1" Classes="settings" Margin="20,0,0,0">
+            <TabItem Header="Моды">
+                <ScrollViewer Padding="12,4,32,28">
+                    <StackPanel MaxWidth="820" HorizontalAlignment="Left" Spacing="12">
+                        <TextBlock Classes="secondary" TextWrapping="Wrap"
+                                   Text="Обязательные моды ставятся всегда. Опциональные можно включить или выключить — изменения применятся при следующем запуске." />
+                        <Border Classes="section" IsVisible="{Binding HasOptionalMods}" Padding="6,4">
+                            <ItemsControl ItemsSource="{Binding OptionalMods}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:OptionalModViewModel">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Margin="12,10">
+                                            <mi:MaterialIcon Kind="PuzzleOutline" Width="20" Height="20" Foreground="{DynamicResource Lumora.TextSecondary}" />
+                                            <StackPanel Grid.Column="1" Spacing="2">
+                                                <TextBlock Classes="h3" Text="{Binding Title}" />
+                                                <TextBlock Classes="muted" Text="{Binding FileName}" FontFamily="{StaticResource Lumora.Mono}" />
+                                            </StackPanel>
+                                            <ToggleSwitch Grid.Column="2" IsChecked="{Binding IsEnabled}" OnContent="" OffContent="" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                        <TextBlock Classes="muted" Text="В этой сборке нет опциональных модов." IsVisible="{Binding !HasOptionalMods}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Запуск">
+                <ScrollViewer Padding="12,4,32,28">
+                    <StackPanel MaxWidth="820" HorizontalAlignment="Left" Spacing="16">
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Classes="h3" Text="Свои настройки для этой сборки" />
+                                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="Выключено — используются общие настройки лаунчера." />
+                                </StackPanel>
+                                <ToggleSwitch Grid.Column="1" IsChecked="{Binding OverrideGlobal}" OnContent="" OffContent="" />
+                            </Grid>
+                        </Border>
+                        <StackPanel Spacing="16" IsEnabled="{Binding OverrideGlobal}" Opacity="{Binding OverrideGlobal, Converter={x:Static BoolConverters.Not}, FallbackValue=1}">
+                            <TextBlock Classes="caption" Text="JAVA" />
+                            <s:JavaSection DataContext="{Binding Editor}" />
+                            <TextBlock Classes="caption" Text="ПАМЯТЬ" />
+                            <s:MemorySection DataContext="{Binding Editor}" />
+                            <TextBlock Classes="caption" Text="ИГРА" />
+                            <s:GameSection DataContext="{Binding Editor}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Обслуживание">
+                <ScrollViewer Padding="12,4,32,28">
+                    <StackPanel Spacing="12" MaxWidth="820" HorizontalAlignment="Left">
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                                <mi:MaterialIcon Kind="FolderOpenOutline" Width="22" Height="22" Foreground="{DynamicResource Lumora.TextSecondary}" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Classes="h3" Text="Папка сборки" />
+                                    <TextBlock Classes="muted" Text="Миры, скриншоты, ресурспаки и шейдеры." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Открыть" Command="{Binding OpenFolderCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                                <mi:MaterialIcon Kind="FileCheckOutline" Width="22" Height="22" Foreground="{DynamicResource Lumora.TextSecondary}" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Classes="h3" Text="Проверить файлы" />
+                                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="Сверит все файлы сборки и докачает повреждённые. Помогает, если игра вылетает." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Проверить" Command="{Binding VerifyCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <Border Classes="section">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                                <mi:MaterialIcon Kind="Restore" Width="22" Height="22" Foreground="{DynamicResource Lumora.Danger}" />
+                                <StackPanel Grid.Column="1" Spacing="3">
+                                    <TextBlock Classes="h3" Text="Переустановить сборку" />
+                                    <TextBlock Classes="muted" TextWrapping="Wrap" Text="Скачает сборку заново. Миры и скриншоты сохранятся." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Classes="danger" Content="Переустановить" Command="{Binding ReinstallCommand}" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

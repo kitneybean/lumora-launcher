@@ -1,0 +1,147 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lumora.Launcher.App.ViewModels"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="Lumora.Launcher.App.Views.ServersView"
+             x:DataType="vm:ServersViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto" Margin="32,4,32,20">
+            <StackPanel Spacing="4">
+                <TextBlock Classes="h1" Text="Серверы" />
+                <TextBlock Classes="secondary" Text="{Binding Summary}" />
+            </StackPanel>
+            <Button Grid.Column="1" VerticalAlignment="Center" Command="{Binding RefreshCommand}" ToolTip.Tip="Обновить список и статусы">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <mi:MaterialIcon Kind="Refresh" Width="17" Height="17" />
+                    <TextBlock Text="Обновить" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" Padding="32,0,32,28">
+            <Panel>
+                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsLoading}" VerticalAlignment="Top" Height="3" MinHeight="3" />
+
+                <!-- Error / empty -->
+                <StackPanel IsVisible="{Binding LoadError, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            HorizontalAlignment="Center" Margin="0,80,0,0" Spacing="12">
+                    <mi:MaterialIcon Kind="CloudOffOutline" Width="40" Height="40" Foreground="{DynamicResource Lumora.TextMuted}" />
+                    <TextBlock Classes="h2" Text="{Binding LoadError}" HorizontalAlignment="Center" />
+                    <Button Classes="primary" HorizontalAlignment="Center" Content="Повторить" Command="{Binding RefreshCommand}" />
+                </StackPanel>
+                <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" Margin="0,80,0,0" Spacing="8">
+                    <mi:MaterialIcon Kind="ServerOff" Width="40" Height="40" Foreground="{DynamicResource Lumora.TextMuted}" />
+                    <TextBlock Classes="h2" Text="Серверов пока нет" HorizontalAlignment="Center" />
+                    <TextBlock Classes="secondary" Text="Администратор ещё не добавил ни одного сервера." HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <ItemsControl x:Name="Cards" ItemsSource="{Binding Servers}" VerticalAlignment="Top">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid x:Name="CardsGrid" Columns="2" ColumnSpacing="16" RowSpacing="16" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ServerCardViewModel">
+                            <Border Classes="card interactive" Padding="20,18">
+                                <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+                                    <!-- Title row -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                        <Border Width="52" Height="52" CornerRadius="12" Background="{Binding TileBackground}">
+                                            <TextBlock Text="{Binding Initial}" FontSize="22" FontWeight="Bold"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{Binding TileForeground}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="5">
+                                            <TextBlock Classes="h2" FontSize="17" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                                <Ellipse Classes="status" Classes.online="{Binding IsOnline}" VerticalAlignment="Center" />
+                                                <TextBlock Classes="muted" FontSize="12.5" Text="{Binding StatusText}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top" Spacing="2">
+                                            <Button Classes="icon" Command="{Binding OpenSettingsCommand}" ToolTip.Tip="Настройки сборки">
+                                                <mi:MaterialIcon Kind="TuneVariant" />
+                                            </Button>
+                                            <Button Classes="icon" ToolTip.Tip="Ещё">
+                                                <mi:MaterialIcon Kind="DotsVertical" />
+                                                <Button.Flyout>
+                                                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                                        <MenuItem Header="Настройки сборки" Command="{Binding OpenSettingsCommand}" Icon="{mi:MaterialIconExt Kind=TuneVariant}" />
+                                                        <MenuItem Header="Открыть папку сборки" Command="{Binding OpenFolderCommand}" Icon="{mi:MaterialIconExt Kind=FolderOpenOutline}" />
+                                                        <MenuItem Header="Скопировать адрес" Command="{Binding CopyAddressCommand}" Icon="{mi:MaterialIconExt Kind=ContentCopy}" />
+                                                    </MenuFlyout>
+                                                </Button.Flyout>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Description -->
+                                    <TextBlock Grid.Row="1" Classes="secondary" Text="{Binding Description}" TextWrapping="Wrap" Margin="0,14,0,0"
+                                               MaxLines="2" TextTrimming="CharacterEllipsis" MinHeight="38" LineHeight="19" />
+
+                                    <!-- Build -->
+                                    <WrapPanel Grid.Row="2" ItemSpacing="6" LineSpacing="6" Margin="0,12,0,0">
+                                        <Border Classes="pill accent">
+                                            <TextBlock Text="{Binding MinecraftVersion}" />
+                                        </Border>
+                                        <Border Classes="pill">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <mi:MaterialIcon Kind="Anvil" />
+                                                <TextBlock Text="{Binding LoaderText}" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Classes="pill" IsVisible="{Binding ModsText, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <mi:MaterialIcon Kind="PuzzleOutline" />
+                                                <TextBlock Text="{Binding ModsText}" />
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Classes="pill warning" IsVisible="{Binding NeedsUpdate}">
+                                            <TextBlock Text="Есть обновление" />
+                                        </Border>
+                                    </WrapPanel>
+
+                                    <Border Grid.Row="4" BorderBrush="{DynamicResource Lumora.Border}" BorderThickness="0,1,0,0" Padding="0,14,0,0" Margin="0,16,0,0">
+                                        <Panel>
+                                            <!-- Idle -->
+                                            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding !IsInstalling}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <mi:MaterialIcon Kind="Web" Width="14" Height="14" Foreground="{DynamicResource Lumora.TextMuted}" />
+                                                    <TextBlock Classes="muted" Text="{Binding Address}" />
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Classes="primary" Classes.warning="{Binding NeedsUpdate}" MinWidth="130"
+                                                        HorizontalContentAlignment="Center"
+                                                        Command="{Binding PrimaryCommand}" IsEnabled="{Binding !IsRunning}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <mi:MaterialIcon Kind="{Binding PrimaryIcon}" Width="18" Height="18" />
+                                                        <TextBlock Text="{Binding PrimaryText}" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+                                            <!-- Installing -->
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="14" IsVisible="{Binding IsInstalling}">
+                                                <StackPanel Spacing="7" VerticalAlignment="Center">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <TextBlock FontWeight="Medium" FontSize="13" Text="{Binding ProgressStage}"
+                                                                   Foreground="{DynamicResource Lumora.Text}" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Grid.Column="1" Classes="muted" Text="{Binding ProgressValue, StringFormat={}{0:0}%}" />
+                                                    </Grid>
+                                                    <ProgressBar Value="{Binding ProgressValue}" IsIndeterminate="{Binding ProgressIndeterminate}" Maximum="100" />
+                                                    <TextBlock Classes="muted" Text="{Binding ProgressDetail}" />
+                                                </StackPanel>
+                                                <Button Grid.Column="1" Classes="ghost" Content="Отмена" VerticalAlignment="Center" Command="{Binding CancelCommand}" />
+                                            </Grid>
+                                        </Panel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Panel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

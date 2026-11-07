@@ -1,22 +1,54 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Lumora.Launcher.App.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:svc="using:Lumora.Launcher.App.Services"
+        xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         x:Class="Lumora.Launcher.App.Views.MainWindow"
-        x:DataType="vm:MainViewModel"
+        x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Lumora" Width="1100" Height="680" MinWidth="900" MinHeight="560">
+        Title="Lumora"
+        Width="1180" Height="740" MinWidth="960" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Lumora.Bg}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="44">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <Panel>
+        <ContentControl Content="{Binding CurrentScreen}" />
 
-    <TextBlock Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
-
+        <!-- Toasts -->
+        <ItemsControl ItemsSource="{Binding Toasts.Items}"
+                      HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                      Margin="0,0,20,20" Width="360">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Spacing="8" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="svc:ToastViewModel">
+                    <Border Classes="toast" Background="{DynamicResource Lumora.Surface}"
+                            BorderBrush="{DynamicResource Lumora.BorderStrong}" BorderThickness="1"
+                            CornerRadius="{StaticResource Lumora.Radius}" Padding="14,12"
+                            BoxShadow="0 8 24 0 #40000000">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Panel VerticalAlignment="Top" Margin="0,1,0,0">
+                                <mi:MaterialIcon Kind="{Binding Icon}" Width="20" Height="20" Foreground="{DynamicResource Lumora.Info}" IsVisible="{Binding IsInfo}" />
+                                <mi:MaterialIcon Kind="{Binding Icon}" Width="20" Height="20" Foreground="{DynamicResource Lumora.Accent}" IsVisible="{Binding IsSuccess}" />
+                                <mi:MaterialIcon Kind="{Binding Icon}" Width="20" Height="20" Foreground="{DynamicResource Lumora.Warning}" IsVisible="{Binding IsWarning}" />
+                                <mi:MaterialIcon Kind="{Binding Icon}" Width="20" Height="20" Foreground="{DynamicResource Lumora.Danger}" IsVisible="{Binding IsError}" />
+                            </Panel>
+                            <StackPanel Grid.Column="1" Spacing="6">
+                                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="{DynamicResource Lumora.Text}" />
+                                <Button Classes="link" Content="{Binding ActionText}" IsVisible="{Binding HasAction}" Command="{Binding RunActionCommand}" />
+                            </StackPanel>
+                            <Button Grid.Column="2" Classes="icon" Padding="4" VerticalAlignment="Top" Command="{Binding CloseCommand}" ToolTip.Tip="Закрыть">
+                                <mi:MaterialIcon Kind="Close" Width="14" Height="14" />
+                            </Button>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Panel>
 </Window>

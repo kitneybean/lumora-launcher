@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="Lumora.Bg" Color="#0D0F13" />
+            <SolidColorBrush x:Key="Lumora.Sidebar" Color="#111419" />
+            <SolidColorBrush x:Key="Lumora.Surface" Color="#171A21" />
+            <SolidColorBrush x:Key="Lumora.SurfaceHover" Color="#1D2129" />
+            <SolidColorBrush x:Key="Lumora.SurfaceSunken" Color="#0F1216" />
+            <SolidColorBrush x:Key="Lumora.Border" Color="#252A33" />
+            <SolidColorBrush x:Key="Lumora.BorderStrong" Color="#343B47" />
+            <SolidColorBrush x:Key="Lumora.Text" Color="#E9ECF1" />
+            <SolidColorBrush x:Key="Lumora.TextSecondary" Color="#9AA3B2" />
+            <SolidColorBrush x:Key="Lumora.TextMuted" Color="#667080" />
+            <SolidColorBrush x:Key="Lumora.Accent" Color="#3DD68C" />
+            <SolidColorBrush x:Key="Lumora.AccentHover" Color="#5CE3A2" />
+            <SolidColorBrush x:Key="Lumora.AccentPressed" Color="#2CB775" />
+            <SolidColorBrush x:Key="Lumora.OnAccent" Color="#04210F" />
+            <SolidColorBrush x:Key="Lumora.AccentSoft" Color="#1F3DD68C" />
+            <SolidColorBrush x:Key="Lumora.AccentText" Color="#5CE3A2" />
+            <SolidColorBrush x:Key="Lumora.Warning" Color="#F2B84B" />
+            <SolidColorBrush x:Key="Lumora.WarningSoft" Color="#1FF2B84B" />
+            <SolidColorBrush x:Key="Lumora.Danger" Color="#F27272" />
+            <SolidColorBrush x:Key="Lumora.DangerSoft" Color="#1FF27272" />
+            <SolidColorBrush x:Key="Lumora.Info" Color="#6EA8FE" />
+            <SolidColorBrush x:Key="Lumora.InfoSoft" Color="#1F6EA8FE" />
+            <SolidColorBrush x:Key="Lumora.Overlay" Color="#99000000" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="Lumora.Bg" Color="#F4F6F8" />
+            <SolidColorBrush x:Key="Lumora.Sidebar" Color="#ECEFF3" />
+            <SolidColorBrush x:Key="Lumora.Surface" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="Lumora.SurfaceHover" Color="#F7F9FA" />
+            <SolidColorBrush x:Key="Lumora.SurfaceSunken" Color="#EEF1F4" />
+            <SolidColorBrush x:Key="Lumora.Border" Color="#DFE3E9" />
+            <SolidColorBrush x:Key="Lumora.BorderStrong" Color="#C9CFD8" />
+            <SolidColorBrush x:Key="Lumora.Text" Color="#14171C" />
+            <SolidColorBrush x:Key="Lumora.TextSecondary" Color="#566070" />
+            <SolidColorBrush x:Key="Lumora.TextMuted" Color="#8A93A1" />
+            <SolidColorBrush x:Key="Lumora.Accent" Color="#18A35E" />
+            <SolidColorBrush x:Key="Lumora.AccentHover" Color="#14B266" />
+            <SolidColorBrush x:Key="Lumora.AccentPressed" Color="#118A4F" />
+            <SolidColorBrush x:Key="Lumora.OnAccent" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="Lumora.AccentSoft" Color="#1A18A35E" />
+            <SolidColorBrush x:Key="Lumora.AccentText" Color="#0F7A45" />
+            <SolidColorBrush x:Key="Lumora.Warning" Color="#B7791F" />
+            <SolidColorBrush x:Key="Lumora.WarningSoft" Color="#1AB7791F" />
+            <SolidColorBrush x:Key="Lumora.Danger" Color="#D14343" />
+            <SolidColorBrush x:Key="Lumora.DangerSoft" Color="#1AD14343" />
+            <SolidColorBrush x:Key="Lumora.Info" Color="#2F6FDB" />
+            <SolidColorBrush x:Key="Lumora.InfoSoft" Color="#1A2F6FDB" />
+            <SolidColorBrush x:Key="Lumora.Overlay" Color="#66000000" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <CornerRadius x:Key="Lumora.RadiusSmall">6</CornerRadius>
+    <CornerRadius x:Key="Lumora.Radius">10</CornerRadius>
+    <CornerRadius x:Key="Lumora.RadiusLarge">14</CornerRadius>
+    <FontFamily x:Key="Lumora.Mono">Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono, monospace</FontFamily>
+
+    <!-- Isometric cube used as the Lumora logo. -->
+    <StreamGeometry x:Key="Lumora.LogoGeometry">M12,1.5 L21.5,7 L21.5,17 L12,22.5 L2.5,17 L2.5,7 Z M12,12 L12,22.5 M2.5,7 L12,12 L21.5,7</StreamGeometry>
+</ResourceDictionary>

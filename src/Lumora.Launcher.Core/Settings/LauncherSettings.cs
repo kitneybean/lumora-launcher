@@ -87,7 +87,7 @@ public sealed class LauncherSettings
     public string Language { get; set; } = "ru";
 
     /// <summary>"system", "light" or "dark".</summary>
-    public string Theme { get; set; } = "system";
+    public string Theme { get; set; } = "dark";
 
     public LauncherVisibility OnGameStart { get; set; } = LauncherVisibility.Minimize;
 
