@@ -117,6 +117,9 @@ public sealed class InstanceSettings
     /// <summary>Player's choice for optional mods: build file path to enabled flag.</summary>
     public Dictionary<string, bool> OptionalFiles { get; set; } = [];
 
+    /// <summary>Minecraft version id the build runs on (e.g. "neoforge-21.1.77"), set after install.</summary>
+    public string? InstalledVersionName { get; set; }
+
     /// <summary>Build revision that was last fully synced.</summary>
     public int InstalledRevision { get; set; }
 

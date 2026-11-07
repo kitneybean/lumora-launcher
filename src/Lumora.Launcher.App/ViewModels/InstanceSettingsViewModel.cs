@@ -87,13 +87,15 @@ public partial class InstanceSettingsViewModel : ViewModelBase
     [RelayCommand]
     private void Verify()
     {
+        _services.Game.MarkForReinstall(_card.Dto.Build.Id);
         _card.MarkForReinstall();
-        _services.Toasts.Show("Файлы будут проверены при следующем запуске");
+        _services.Toasts.Show("Нажмите «Установить» на карточке — все файлы будут проверены заново");
     }
 
     [RelayCommand]
     private void Reinstall()
     {
+        _services.Game.MarkForReinstall(_card.Dto.Build.Id);
         _card.MarkForReinstall();
         _services.Toasts.Show($"Сборка «{Title}» будет установлена заново");
         Back();

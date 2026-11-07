@@ -22,6 +22,8 @@ public sealed class DemoGameService : IGameService
     public InstanceState GetState(LauncherBuildSummaryDto build) =>
         _states.GetValueOrDefault(build.Id, InstanceState.NotInstalled);
 
+    public void MarkForReinstall(Guid buildId) => _states[buildId] = InstanceState.NotInstalled;
+
     public async Task InstallAsync(AccountSession session, LauncherBuildSummaryDto build, IProgress<InstallProgress> progress, CancellationToken ct = default)
     {
         (string Stage, int Steps)[] stages =

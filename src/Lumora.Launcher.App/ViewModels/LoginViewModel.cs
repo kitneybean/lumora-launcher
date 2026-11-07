@@ -49,6 +49,10 @@ public partial class LoginViewModel(AppServices services, Action<AccountSession>
         try
         {
             var session = await services.Api.LoginAsync(Login.Trim(), Password);
+            if (Remember)
+                services.Sessions?.Save(session);
+            else
+                services.Sessions?.Clear();
             onLoggedIn(session);
         }
         catch (AuthenticationFailedException e)

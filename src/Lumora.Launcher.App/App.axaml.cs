@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -7,7 +8,10 @@ using Lumora.Launcher.App.Services;
 using Lumora.Launcher.App.Services.Demo;
 using Lumora.Launcher.App.ViewModels;
 using Lumora.Launcher.App.Views;
+using Lumora.Launcher.Core.Api;
+using Lumora.Launcher.Core.Game;
 using Lumora.Launcher.Core.Settings;
+using Lumora.Launcher.Core.Status;
 
 namespace Lumora.Launcher.App;
 
@@ -25,9 +29,7 @@ public partial class App : Application
             var args = desktop.Args ?? [];
             var root = Option(args, "--data") ?? Environment.GetEnvironmentVariable("LUMORA_HOME") ?? LauncherPaths.DefaultRoot;
             var store = new SettingsStore(new LauncherPaths(root));
-
-            // Until the Lumora Auth API and CmlLib integration land, the launcher runs on demo services.
-            var services = new AppServices(store, new DemoLumoraApi(), new DemoGameService(), new DemoServerStatusService(), isDemo: true);
+            var services = args.Contains("--demo") ? CreateDemo(store) : CreateReal(store);
             services.ApplyTheme();
 
             var window = new MainWindow { DataContext = new MainWindowViewModel(services) };
@@ -37,6 +39,24 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>Offline demo data (for screenshots and UI work): <c>--demo</c>.</summary>
+    public static AppServices CreateDemo(SettingsStore store) =>
+        new(store, new DemoLumoraApi(), new DemoGameService(), new DemoServerStatusService(), isDemo: true);
+
+    private static AppServices CreateReal(SettingsStore store)
+    {
+        AppServices services = null!;
+        var settings = store.LoadGlobal();
+        var http = LumoraApiClient.CreateHttpClient(settings.ProxyUrl);
+        var api = new LumoraApiClient(() => services.Settings.AuthServerUrl, http);
+        var game = new GameService(api, store, () => services.Settings);
+        services = new AppServices(store, api, game, new ServerListPing(), isDemo: false)
+        {
+            Sessions = new SessionStore(Path.Combine(store.Paths.Root, "session.dat")),
+        };
+        return services;
     }
 
     private static string? Option(string[] args, string name)

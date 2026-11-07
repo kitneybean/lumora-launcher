@@ -46,6 +46,9 @@ public sealed class AppServices
     public IServerStatusService Status { get; }
     public bool IsDemo { get; }
     public Platform Platform { get; } = new();
+
+    /// <summary>Saved login ("Запомнить меня"); null in demo mode.</summary>
+    public Lumora.Launcher.Core.Api.SessionStore? Sessions { get; init; }
     public ToastService Toasts { get; } = new();
 
     /// <summary>Saves settings.json shortly after the last change (debounced).</summary>

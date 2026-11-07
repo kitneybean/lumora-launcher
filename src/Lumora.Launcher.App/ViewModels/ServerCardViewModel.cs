@@ -201,7 +201,10 @@ public partial class ServerCardViewModel : ViewModelBase
         try
         {
             var wasUpdate = State == InstanceState.UpdateAvailable;
-            await _services.Game.InstallAsync(_shell.Session, Dto.Build, progress, _cts.Token);
+            var session = _shell.Session;
+            var token = _cts.Token;
+            // CmlLib hashes and unpacks on the calling thread: keep the UI responsive.
+            await Task.Run(() => _services.Game.InstallAsync(session, Dto.Build, progress, token), token);
             State = _services.Game.GetState(Dto.Build);
             _services.Toasts.Success(wasUpdate ? $"Сборка «{Name}» обновлена" : $"Сборка «{Name}» установлена");
         }

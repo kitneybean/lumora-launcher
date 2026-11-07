@@ -39,4 +39,10 @@ public sealed class LauncherPaths
     public string CacheDirectory(LauncherSettings settings) => Path.Combine(DataDirectory(settings), "cache");
 
     public string RuntimesDirectory(LauncherSettings settings) => Path.Combine(DataDirectory(settings), "runtimes");
+
+    /// <summary>Libraries, versions, assets and Java runtimes shared by all builds.</summary>
+    public string SharedDirectory(LauncherSettings settings) => Path.Combine(DataDirectory(settings), "shared");
+
+    /// <summary>Downloaded build files by SHA-1, reused between builds and when mods are toggled.</summary>
+    public string FileCacheDirectory(LauncherSettings settings) => Path.Combine(CacheDirectory(settings), "files");
 }

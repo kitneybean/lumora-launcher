@@ -54,9 +54,18 @@ public partial class ServersViewModel : ViewModelBase
                 _ = card.LoadDetailsAsync();
             UpdateSummary();
         }
-        catch (Exception)
+        catch (Lumora.Launcher.Core.Services.SessionExpiredException)
         {
-            LoadError = "Не удалось загрузить список серверов.";
+            _services.Toasts.Error("Сессия истекла — войдите заново");
+            _shell.LogoutCommand.Execute(null);
+        }
+        catch (System.Net.Http.HttpRequestException)
+        {
+            LoadError = $"Сервер {_services.Settings.AuthServerUrl} недоступен. Проверьте интернет или адрес в настройках.";
+        }
+        catch (Exception e)
+        {
+            LoadError = "Не удалось загрузить список серверов: " + e.Message;
         }
         finally
         {

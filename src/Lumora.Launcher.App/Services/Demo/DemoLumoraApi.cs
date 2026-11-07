@@ -76,6 +76,14 @@ public sealed class DemoLumoraApi : ILumoraApi
 
     public Task<byte[]?> GetSkinAsync(AccountSession session, CancellationToken ct = default) =>
         Task.FromResult<byte[]?>(DemoSkin.Generate());
+
+    public Task<AccountSession> RefreshAsync(AccountSession session, CancellationToken ct = default) => Task.FromResult(session);
+
+    public async Task<AccountSession> UploadSkinAsync(AccountSession session, byte[] png, bool slim, CancellationToken ct = default)
+    {
+        await Task.Delay(300, ct);
+        return session with { SlimModel = slim };
+    }
 }
 
 /// <summary>Draws a simple 64x64 skin in the standard layout so the skin preview has something to show.</summary>

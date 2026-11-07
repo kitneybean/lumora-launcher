@@ -43,7 +43,18 @@ public partial class ShellViewModel : ViewModelBase
         _ = LoadSkinAsync();
     }
 
-    public AccountSession Session { get; }
+    public AccountSession Session { get; private set; }
+
+    /// <summary>Replaces the session (new token or skin) and keeps the remembered copy in sync.</summary>
+    public void UpdateSession(AccountSession session)
+    {
+        Session = session;
+        if (_services.Sessions?.Load() is not null)
+            _services.Sessions.Save(session);
+    }
+
+    /// <summary>PNG of the current skin (to re-upload with another model).</summary>
+    public byte[]? SkinPng { get; private set; }
     public string PlayerName => Session.PlayerName;
     public bool IsDemo => _services.IsDemo;
     public Appearance Appearance => _services.Appearance;
@@ -98,6 +109,7 @@ public partial class ShellViewModel : ViewModelBase
 
     public void SetSkin(byte[] png, bool slim)
     {
+        SkinPng = png;
         using var stream = new MemoryStream(png);
         SkinBitmap = new Bitmap(stream);
         SlimModel = slim;

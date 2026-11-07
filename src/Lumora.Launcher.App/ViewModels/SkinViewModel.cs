@@ -34,9 +34,8 @@ public partial class SkinViewModel : ViewModelBase
             if (_shell.SlimModel != value)
             {
                 _shell.SlimModel = value;
-                _services.Toasts.Show(_services.IsDemo
-                    ? "Демо-режим: модель сменится на сервере после подключения API"
-                    : "Модель скина обновлена");
+                if (_shell.SkinPng is { } png)
+                    _ = SendAsync(png, value, value ? "Теперь тонкая модель" : "Теперь классическая модель");
             }
         }
     }
@@ -85,14 +84,33 @@ public partial class SkinViewModel : ViewModelBase
                     return;
                 }
             }
-            _shell.SetSkin(bytes, IsSlim);
-            _services.Toasts.Show(_services.IsDemo
-                ? "Демо-режим: скин показан локально и не отправлен на сервер"
-                : "Скин загружен", ToastKind.Success);
+            await SendAsync(bytes, IsSlim, "Скин загружен — его увидят в игре после перезахода");
         }
         catch (Exception)
         {
             _services.Toasts.Error("Не удалось прочитать файл. Нужен PNG-скин Minecraft.");
+        }
+    }
+
+    [ObservableProperty]
+    public partial bool IsUploading { get; set; }
+
+    private async Task SendAsync(byte[] png, bool slim, string success)
+    {
+        IsUploading = true;
+        try
+        {
+            _shell.UpdateSession(await _services.Api.UploadSkinAsync(_shell.Session, png, slim));
+            _shell.SetSkin(png, slim);
+            _services.Toasts.Show(_services.IsDemo ? "Демо-режим: скин показан только в лаунчере" : success, ToastKind.Success);
+        }
+        catch (Exception e)
+        {
+            _services.Toasts.Error("Не удалось загрузить скин: " + e.Message);
+        }
+        finally
+        {
+            IsUploading = false;
         }
     }
 
