@@ -81,3 +81,26 @@ dotnet run --project src/Lumora.Launcher.App
 ```
 
 Другой путь к контрактам: `dotnet build -p:LumoraContractsProject=<путь>/Lumora.Contracts.csproj`.
+
+## Релизы и самообновление
+
+Выпуск версии — тег в GitHub:
+
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+Workflow `.github/workflows/release.yml` прогоняет тесты, собирает лаунчер для `win-x64`, `linux-x64`, `osx-x64`,
+`osx-arm64` (один файл, .NET внутри, установка не нужна) и публикует релиз с архивами
+`Lumora-<версия>-<платформа>.zip` и `checksums.txt` (SHA-256). Нужен доступ к репозиторию `lumora-auth` рядом:
+по умолчанию `<владелец>/lumora-auth`, иначе переменная `LUMORA_AUTH_REPO`, для приватного — секрет `LUMORA_AUTH_TOKEN`.
+
+Лаунчер при запуске (не чаще двух раз в день) спрашивает GitHub о последнем релизе и предлагает обновиться.
+Обновление скачивается, проверяется по SHA-256 и подменяет файлы после выхода из лаунчера, затем лаунчер
+перезапускается. Репозиторий встраивается при сборке (`-p:LumoraUpdateRepo=owner/name`), его можно сменить в
+«Настройки → Лаунчер». Если папка лаунчера защищена от записи, откроется страница релиза.
+
+Локальная сборка архивов: `./build/publish.ps1 -Version 0.2.0 -Repository owner/lumora-launcher`
+(Windows) или `build/publish.sh 0.2.0 owner/lumora-launcher` (Linux/macOS), результат — в `artifacts/`.
+Сборки для macOS пока без подписи Apple: при первом запуске macOS попросит подтвердить открытие.

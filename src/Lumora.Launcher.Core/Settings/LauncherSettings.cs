@@ -101,6 +101,14 @@ public sealed class LauncherSettings
 
     public int DownloadThreads { get; set; } = 8;
 
+    /// <summary>Look for a new launcher version on GitHub at start.</summary>
+    public bool CheckUpdates { get; set; } = true;
+
+    public DateTimeOffset? LastUpdateCheck { get; set; }
+
+    /// <summary>GitHub repository "owner/name" with launcher releases; null = the one built into the release.</summary>
+    public string? UpdateRepository { get; set; }
+
     public string? ProxyUrl { get; set; }
 
     public GameSettings Game { get; set; } = new();

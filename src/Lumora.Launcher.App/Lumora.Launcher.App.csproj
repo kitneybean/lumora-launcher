@@ -11,6 +11,11 @@
     <Version>0.1.0</Version>
   </PropertyGroup>
 
+  <!-- Release builds bake in the GitHub repository used for self-update: -p:LumoraUpdateRepo=owner/name -->
+  <ItemGroup Condition="'$(LumoraUpdateRepo)' != ''">
+    <AssemblyMetadata Include="LumoraUpdateRepo" Value="$(LumoraUpdateRepo)" />
+  </ItemGroup>
+
   <ItemGroup>
     
     <AvaloniaResource Include="Assets\**" />

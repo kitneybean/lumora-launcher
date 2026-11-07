@@ -27,6 +27,7 @@ public sealed class AppServices
             ShowBackground = Settings.ShowBackground,
             AnimateBackground = Settings.AnimateBackground,
         };
+        Updates = new UpdateController(this, Lumora.Launcher.Core.Api.LumoraApiClient.CreateHttpClient(Settings.ProxyUrl));
         _saveTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(400) };
         _saveTimer.Tick += (_, _) =>
         {
@@ -41,6 +42,7 @@ public sealed class AppServices
     public LauncherPaths Paths => Store.Paths;
     public LauncherSettings Settings { get; }
     public Appearance Appearance { get; }
+    public UpdateController Updates { get; }
     public ILumoraApi Api { get; }
     public IGameService Game { get; }
     public IServerStatusService Status { get; }

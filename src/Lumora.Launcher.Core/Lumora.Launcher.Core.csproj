@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Lumora.Launcher.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CmlLib.Core" Version="4.1.0" />
     <PackageReference Include="CmlLib.Core.Installer.NeoForge" Version="4.0.1" />
     <PackageReference Include="fNbt" Version="2.1.0" />

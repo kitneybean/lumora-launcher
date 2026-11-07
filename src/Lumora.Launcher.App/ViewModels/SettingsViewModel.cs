@@ -32,6 +32,8 @@ public partial class SettingsViewModel : ViewModelBase
         ProxyUrl = S.ProxyUrl ?? "";
         DataDirectory = S.DataDirectory ?? "";
         AuthServerUrl = S.AuthServerUrl;
+        CheckUpdates = S.CheckUpdates;
+        UpdateRepository = S.UpdateRepository ?? "";
         _ready = true;
     }
 
@@ -39,6 +41,17 @@ public partial class SettingsViewModel : ViewModelBase
     private readonly bool _ready;
 
     public GameSettingsEditorViewModel Game { get; }
+
+    public UpdateController Updates => _services.Updates;
+
+    [ObservableProperty]
+    public partial bool CheckUpdates { get; set; }
+
+    [ObservableProperty]
+    public partial string UpdateRepository { get; set; }
+
+    partial void OnCheckUpdatesChanged(bool value) => Save(() => S.CheckUpdates = value);
+    partial void OnUpdateRepositoryChanged(string value) => Save(() => S.UpdateRepository = string.IsNullOrWhiteSpace(value) ? null : value.Trim());
 
     public IReadOnlyList<Choice<string>> Themes { get; } =
     [

@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _services = services;
         var login = new LoginViewModel(services, OnLoggedIn);
         CurrentScreen = login;
+        _ = services.Updates.CheckOnStartAsync();
 
         if (services.Sessions?.Load() is { } saved)
         {

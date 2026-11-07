@@ -84,6 +84,45 @@
                         </Border>
 
                         <Border Classes="section">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Обновления лаунчера" />
+                                        <TextBlock Classes="muted">
+                                            <Run Text="Установлена версия" />
+                                            <Run Text="{Binding Updates.CurrentVersion}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <Button Classes="primary" Command="{Binding Updates.InstallCommand}" IsVisible="{Binding Updates.HasUpdate}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <mi:MaterialIcon Kind="Download" Width="16" Height="16" />
+                                                <TextBlock Text="{Binding Updates.InstallText}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Classes="ghost" Command="{Binding Updates.CheckCommand}" Content="Проверить" />
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Classes="secondary" Text="{Binding Updates.Status}" TextWrapping="Wrap"
+                                           IsVisible="{Binding Updates.Status, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                <ProgressBar Value="{Binding Updates.Progress}" Maximum="100" IsVisible="{Binding Updates.IsDownloading}" Height="4" MinHeight="4" />
+                                <Button Classes="link" Content="Что нового (страница релиза)" Command="{Binding Updates.OpenReleasePageCommand}" IsVisible="{Binding Updates.HasUpdate}" />
+                                <Separator Classes="thin" />
+                                <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Classes="h3" Text="Проверять при запуске" />
+                                        <TextBlock Classes="muted" Text="Не чаще двух раз в день, через GitHub Releases." />
+                                    </StackPanel>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding CheckUpdates}" OnContent="" OffContent="" />
+                                </Grid>
+                                <StackPanel Spacing="6">
+                                    <TextBlock Classes="muted" Text="Репозиторий с релизами (владелец/название). Пусто — тот, что встроен в лаунчер." />
+                                    <TextBox Text="{Binding UpdateRepository}" PlaceholderText="owner/lumora-launcher" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Classes="section">
                             <StackPanel>
                                 <Grid Classes="setting" ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                     <StackPanel Spacing="3">

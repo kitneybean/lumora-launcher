@@ -1,0 +1,44 @@
+name: Release
+
+# Push a tag like v0.2.0 to build the launcher for every platform and publish a GitHub release.
+# Installed launchers find it through the GitHub API and update themselves.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Lumora.Contracts lives in lumora-auth, checked out side by side as in the local layout.
+      - uses: actions/checkout@v4
+        with:
+          path: lumora-launcher
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.LUMORA_AUTH_REPO || format('{0}/lumora-auth', github.repository_owner) }}
+          path: lumora-auth
+          # For a private lumora-auth repository add a token secret with read access:
+          token: ${{ secrets.LUMORA_AUTH_TOKEN || github.token }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test
+        working-directory: lumora-launcher
+        run: dotnet test -c Release
+
+      - name: Publish
+        working-directory: lumora-launcher
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          bash build/publish.sh "$VERSION" "$GITHUB_REPOSITORY" win-x64 linux-x64 osx-x64 osx-arm64
+
+      - name: Create release
+        working-directory: lumora-launcher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" artifacts/* --title "Lumora $GITHUB_REF_NAME" --generate-notes
