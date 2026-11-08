@@ -42,3 +42,56 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" artifacts/* --title "Lumora $GITHUB_REF_NAME" --generate-notes
+
+  # Windows installer (Inno Setup): per-user install with Start menu and desktop shortcuts.
+  # Added to the same release; self-update keeps using the win-x64 zip.
+  windows-installer:
+    needs: release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: lumora-launcher
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.LUMORA_AUTH_REPO || format('{0}/lumora-auth', github.repository_owner) }}
+          path: lumora-auth
+          token: ${{ secrets.LUMORA_AUTH_TOKEN || github.token }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish win-x64
+        working-directory: lumora-launcher
+        shell: pwsh
+        run: |
+          $version = "$env:GITHUB_REF_NAME".TrimStart('v')
+          dotnet publish src/Lumora.Launcher.App/Lumora.Launcher.App.csproj -c Release -r win-x64 --self-contained `
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none `
+            -p:Version=$version -p:LumoraUpdateRepo=$env:GITHUB_REPOSITORY -o publish
+          Remove-Item publish\*.pdb -ErrorAction SilentlyContinue
+
+      - name: Build installer
+        working-directory: lumora-launcher
+        shell: pwsh
+        run: |
+          $iscc = @("${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $iscc) {
+            choco install innosetup -y --no-progress
+            $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          }
+          $version = "$env:GITHUB_REF_NAME".TrimStart('v')
+          & $iscc /Qp "/DAppVersion=$version" "/DSourceDir=$PWD\publish" "/DOutputDir=$PWD\installer" build\installer\lumora.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload to the release
+        working-directory: lumora-launcher
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $setup = Get-ChildItem installer\*.exe | Select-Object -First 1
+          gh release download $env:GITHUB_REF_NAME --pattern checksums.txt --dir sums
+          $hash = (Get-FileHash $setup.FullName -Algorithm SHA256).Hash.ToLower()
+          Add-Content sums\checksums.txt "$hash  $($setup.Name)" -Encoding ascii
+          gh release upload $env:GITHUB_REF_NAME $setup.FullName sums\checksums.txt --clobber
