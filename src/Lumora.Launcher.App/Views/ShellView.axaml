@@ -72,7 +72,7 @@
         <Grid Grid.Column="1" RowDefinitions="44,*">
             <c:SpaceBackdrop Grid.RowSpan="2" Seed="7" Opacity="{DynamicResource Lumora.BackdropOpacity}"
                              IsVisible="{Binding Appearance.ShowBackground}" IsAnimated="{Binding Appearance.AnimateBackground}"
-                             PlanetCenter="0.88,0.95" PlanetSize="0.44" MoonCenter="0.6,0.62" />
+                             PlanetCenter="0.8,0.82" PlanetSize="0.4" MoonCenter="0.46,0.92" />
             <!-- Keeps page headers readable over the scene. -->
             <Border Grid.RowSpan="2" IsHitTestVisible="False" IsVisible="{Binding Appearance.ShowBackground}"
                     Background="{DynamicResource Lumora.BackdropScrim}" />

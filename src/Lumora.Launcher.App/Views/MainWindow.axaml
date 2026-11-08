@@ -5,7 +5,7 @@
         xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         x:Class="Lumora.Launcher.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/lumora.ico"
         Title="Lumora"
         Width="1180" Height="740" MinWidth="960" MinHeight="600"
         WindowStartupLocation="CenterScreen"

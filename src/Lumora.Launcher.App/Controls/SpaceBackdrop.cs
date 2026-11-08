@@ -217,9 +217,12 @@ public sealed class SpaceBackdrop : Control
             DrawCube(px, w, h, ax, ay, size, 0x4A4A58, seed + i, dim: 0.55);
         }
 
+        var beforeBodies = (uint[])px.Clone();
         var radius = PlanetSize * min;
         PaintPlanet(px, w, h, PlanetCenter.X * w, PlanetCenter.Y * h, radius, seed);
         DrawCube(px, w, h, (int)(MoonCenter.X * w), (int)(MoonCenter.Y * h), Math.Max(5, (int)(min * 0.07)), 0x9A9AA6, seed, dim: 1);
+        // Twinkling stars are drawn on top later: drop those now hidden behind the planet or the moon.
+        _twinkles.RemoveAll(t => px[t.Y * w + t.X] != beforeBodies[t.Y * w + t.X]);
 
         var bitmap = new WriteableBitmap(new PixelSize(w, h), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
         using (var fb = bitmap.Lock())
@@ -303,73 +306,103 @@ public sealed class SpaceBackdrop : Control
         }
     }
 
+    /// <summary>
+    /// Isometric cube hit test. Faces: 0 = top, 1 = left (lit), 2 = right (night side);
+    /// (a, b) are 0..1 coordinates on the face.
+    /// </summary>
+    private static bool CubeHit(double fx, double fy, double s, out int face, out double a, out double b)
+    {
+        // Top face: rhombus between (0,-s), (s,-s/2), (0,0), (-s,-s/2).
+        a = (fx / s + 2 * (fy + s) / s) / 2;
+        b = (2 * (fy + s) / s - fx / s) / 2;
+        if (a is >= 0 and <= 1 && b is >= 0 and <= 1)
+        {
+            face = 0;
+            return true;
+        }
+        if (fx <= 0)
+        {
+            // Left face: from (-s,-s/2) along (s, s/2) and down.
+            face = 1;
+            a = (fx + s) / s;
+            b = (fy + s / 2.0 - a * s / 2) / s;
+        }
+        else
+        {
+            // Right face: from (0,0) along (s, -s/2) and down.
+            face = 2;
+            a = fx / s;
+            b = (fy + a * s / 2) / s;
+        }
+        return a is >= 0 and <= 1 && b is >= 0 and <= 1;
+    }
+
+    /// <summary>The Earth as a Minecraft block: terrain on every face, clouds, night lights and an atmosphere halo.</summary>
     private static void PaintPlanet(uint[] px, int w, int h, double cx, double cy, double radius, int seed)
     {
-        // Light from the upper left, slightly in front.
-        const double lx = -0.62, ly = -0.48, lz = 0.62;
-        var atmosphere = Math.Max(2.5, radius * 0.05);
+        var s = radius * 0.86;
+        var texels = (int)Math.Clamp(s / 2.4, 8, 28);
+        var atmosphere = Math.Max(3, (int)(s * 0.06));
 
-        var x0 = Math.Max(0, (int)(cx - radius - atmosphere - 1));
-        var x1 = Math.Min(w - 1, (int)(cx + radius + atmosphere + 1));
-        var y0 = Math.Max(0, (int)(cy - radius - atmosphere - 1));
-        var y1 = Math.Min(h - 1, (int)(cy + radius + atmosphere + 1));
+        var x0 = Math.Max(0, (int)(cx - s - atmosphere - 1));
+        var x1 = Math.Min(w - 1, (int)(cx + s + atmosphere + 1));
+        var y0 = Math.Max(0, (int)(cy - s - atmosphere - 1));
+        var y1 = Math.Min(h - 1, (int)(cy + s + atmosphere + 1));
 
         for (var y = y0; y <= y1; y++)
         {
             for (var x = x0; x <= x1; x++)
             {
-                var dx = (x + 0.5 - cx) / radius;
-                var dy = (y + 0.5 - cy) / radius;
-                var d2 = dx * dx + dy * dy;
+                double fx = x + 0.5 - cx, fy = y + 0.5 - cy;
                 var i = y * w + x;
 
-                if (d2 > 1)
+                if (!CubeHit(fx, fy, s, out var face, out var a, out var b))
                 {
-                    // Atmosphere glow, stronger on the lit side.
-                    var dist = (Math.Sqrt(d2) - 1) * radius;
-                    if (dist > atmosphere)
-                        continue;
-                    var len = Math.Sqrt(d2);
-                    var lit = Math.Max(0, (dx / len) * lx + (dy / len) * ly) / 0.79;
-                    var a = (1 - dist / atmosphere) * (0.25 + 0.6 * lit);
-                    a = Math.Floor(a * 3 + BayerAt(x, y) - 0.3) / 3;
-                    if (a > 0)
-                        px[i] = Blend(px[i], 0x5CE3C8, Math.Min(0.75, a));
+                    // Atmosphere: layers of a slightly bigger cube, brighter on the lit (left/top) side.
+                    for (var k = 1; k <= atmosphere; k++)
+                    {
+                        if (!CubeHit(fx, fy, s + k, out var hf, out _, out _))
+                            continue;
+                        var lit = hf == 2 ? 0.25 : fy < -s * 0.5 || fx < 0 ? 1.0 : 0.6;
+                        var alpha = (1 - (k - 1) / (double)atmosphere) * (0.22 + 0.5 * lit);
+                        alpha = Math.Floor(alpha * 3 + BayerAt(x, y) - 0.3) / 3;
+                        if (alpha > 0)
+                            px[i] = Blend(px[i], 0x5CE3C8, Math.Min(0.7, alpha));
+                        break;
+                    }
                     continue;
                 }
 
-                var nz = Math.Sqrt(1 - d2);
-                // Slight axial tilt.
-                const double tilt = 0.32;
-                var tx = dx * Math.Cos(tilt) - dy * Math.Sin(tilt);
-                var ty = dx * Math.Sin(tilt) + dy * Math.Cos(tilt);
-                var lon = Math.Atan2(tx, nz) + 0.6;
-                var lat = Math.Asin(Math.Clamp(ty, -1, 1));
+                var u = Math.Min(texels - 1, (int)(a * texels));
+                var v = Math.Min(texels - 1, (int)(b * texels));
+                var fseed = seed + 101 * (face + 1);
+                var e = Fbm(u / 4.5, v / 4.5, fseed);
+                var jitter = (Hash01(fseed + 1, u, v) - 0.5) * 0.08;
 
-                // Voxel grid on the sphere: every block has one material.
-                var bu = (int)Math.Floor((lon / Math.PI + 1) * 22);
-                var bv = (int)Math.Floor((lat / Math.PI + 0.5) * 22);
-                var e = Fbm(bu / 5.0, bv / 5.0, seed + 11);
-                var jitter = (Hash01(seed + 12, bu, bv) - 0.5) * 0.08;
+                // Cold near the north pole: the middle of the top face and the upper rows of the sides.
+                double cold = face == 0
+                    ? 1 - Math.Sqrt((a - 0.5) * (a - 0.5) + (b - 0.5) * (b - 0.5)) * 3.2
+                    : 0.45 - b * 1.4;
+                cold += (Hash01(fseed + 2, u, v) - 0.5) * 0.1;
 
                 uint color;
                 var isLand = false;
-                if (Math.Abs(lat) > 1.2 - jitter * 2)
-                    color = 0xE6EEF4; // ice caps
+                if (cold > 0.55)
+                    color = 0xE6EEF4; // ice cap
                 else if (e < 0.40)
                     color = 0x24438F; // deep ocean
                 else if (e < 0.48)
                     color = 0x3563C2; // ocean
                 else if (e < 0.515)
-                    color = 0xD9C98A; // sand
+                    color = cold > 0.4 ? 0xC9D6DEu : 0xD9C98Au; // sand / frozen shore
                 else if (e < 0.64)
                 {
-                    color = Hash01(seed + 13, bu, bv) > 0.5 ? 0x5FAA3Bu : 0x55A035u; // grass
+                    color = cold > 0.4 ? 0xDDE6EAu : Hash01(fseed + 3, u, v) > 0.5 ? 0x5FAA3Bu : 0x55A035u; // grass / snow
                     isLand = true;
                 }
                 else if (e < 0.72)
                 {
-                    color = 0x3C7A2A; // forest
+                    color = cold > 0.45 ? 0x2F5E3Bu : 0x3C7A2Au; // forest / taiga
                     isLand = true;
                 }
                 else
@@ -377,27 +410,32 @@ public sealed class SpaceBackdrop : Control
 
                 color = Shade(color, 1 + jitter);
 
-                // Clouds: blocky, on their own coarser grid.
-                var cu = (int)Math.Floor((lon / Math.PI + 1) * 15 + 3);
-                var cv = (int)Math.Floor((lat / Math.PI + 0.5) * 15);
-                var cloud = Fbm(cu / 3.0 + 50, cv / 3.0, seed + 21) > 0.7;
+                // Clouds on a coarser grid.
+                var cloud = Fbm(u / 3.6 + 40, v / 3.6, fseed + 7) > 0.66;
                 if (cloud)
-                    color = Blend(color, 0xF4F7FA, 0.85);
+                    color = Blend(color, 0xF4F7FA, 0.82);
 
-                // Lighting in hard pixel-art bands.
-                var diffuse = dx * lx + dy * ly + nz * lz;
-                var shade = diffuse > 0.55 ? 1.0 : diffuse > 0.25 ? 0.82 : diffuse > 0.0 ? 0.6 : diffuse > -0.22 ? 0.38 : 0.2;
+                // Face lighting: sun from the upper left; the right face is the night side.
+                var shade = face switch
+                {
+                    0 => 1.0,
+                    1 => 0.8 - b * 0.12,
+                    _ => 0.36 - b * 0.08,
+                };
                 var shaded = Shade(color, shade);
-                if (shade < 0.4)
+                if (face == 2)
                 {
                     shaded = Blend(shaded, 0x0B1024, 0.35);
-                    // Village lights on the night side.
-                    if (isLand && !cloud && Hash01(seed + 31, bu, bv) < 0.12)
-                        shaded = Hash01(seed + 32, x, y) > 0.4 ? 0xFFC45Cu : 0xE89A3Au;
+                    if (isLand && !cloud && Hash01(fseed + 9, u, v) < 0.14)
+                        shaded = Hash01(seed + 32, x, y) > 0.4 ? 0xFFC45Cu : 0xE89A3Au; // village lights
                 }
-                // Rim light on the lit edge.
-                if (d2 > 0.9 && diffuse > 0.2)
-                    shaded = Blend(shaded, 0xBDFCEB, 0.25);
+
+                // Rim light along the sunlit outer edges, darker seams between faces.
+                var texel = 1.0 / texels;
+                if ((face == 0 && (a < texel * 0.6 || b < texel * 0.6)) || (face == 1 && a < texel * 0.6))
+                    shaded = Blend(shaded, 0xBDFCEB, 0.35);
+                else if ((face == 1 && a > 1 - texel * 0.5) || (face == 2 && a < texel * 0.5))
+                    shaded = Shade(shaded, 0.7);
 
                 px[i] = shaded;
             }
@@ -414,33 +452,9 @@ public sealed class SpaceBackdrop : Control
             {
                 if (x < 0 || y < 0 || x >= w || y >= h)
                     continue;
-                double fx = x + 0.5 - cx, fy = y + 0.5 - cy;
-                double a, b, shade;
-                int face;
-
-                // Top face: rhombus between (0,-s), (s,-s/2), (0,0), (-s,-s/2).
-                var ta = (fx / s + 2 * (fy + s) / s) / 2;
-                var tb = (2 * (fy + s) / s - fx / s) / 2;
-                if (ta is >= 0 and <= 1 && tb is >= 0 and <= 1)
-                {
-                    a = ta; b = tb; shade = 1.0; face = 0;
-                }
-                else if (fx <= 0)
-                {
-                    // Left face: from (-s,-s/2) along (s, s/2) and down.
-                    a = (fx + s) / s;
-                    b = (fy + s / 2.0 - a * s / 2) / s;
-                    shade = 0.74; face = 1;
-                }
-                else
-                {
-                    // Right face: from (0,0) along (s, -s/2) and down.
-                    a = fx / s;
-                    b = (fy + a * s / 2) / s;
-                    shade = 0.52; face = 2;
-                }
-                if (a < 0 || a > 1 || b < 0 || b > 1)
+                if (!CubeHit(x + 0.5 - cx, y + 0.5 - cy, s, out var face, out var a, out var b))
                     continue;
+                var shade = face switch { 0 => 1.0, 1 => 0.74, _ => 0.52 };
 
                 var u = Math.Min(texels - 1, (int)(a * texels));
                 var v = Math.Min(texels - 1, (int)(b * texels));
