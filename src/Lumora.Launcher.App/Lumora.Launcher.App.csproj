@@ -9,7 +9,7 @@
     <AssemblyName>Lumora</AssemblyName>
     <RootNamespace>Lumora.Launcher.App</RootNamespace>
     <Version>0.1.1</Version>
-    <ApplicationIcon>Assetsumora.ico</ApplicationIcon>
+    <ApplicationIcon>Assets/lumora.ico</ApplicationIcon>
   </PropertyGroup>
 
   <!-- Auth server the launcher connects to out of the box: -p:LumoraAuthServer=https://auth.example.com -->
