@@ -1,5 +1,5 @@
 using Lumora.Contracts;
-using Lumora.Launcher.Core.Game;
+using Lumora.Shared.Sync;
 
 namespace Lumora.Launcher.Tests;
 

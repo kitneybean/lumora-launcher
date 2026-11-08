@@ -8,6 +8,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Lumora.Launcher.Core.Services;
 using Lumora.Launcher.Core.Settings;
+using Lumora.Shared.Status;
 
 namespace Lumora.Launcher.App.Services;
 

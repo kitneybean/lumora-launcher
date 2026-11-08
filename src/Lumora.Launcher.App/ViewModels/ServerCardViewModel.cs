@@ -9,6 +9,7 @@ using Lumora.Contracts;
 using Lumora.Launcher.App.Services;
 using Lumora.Launcher.Core.Services;
 using Lumora.Launcher.Core.Settings;
+using Lumora.Shared.Status;
 using Material.Icons;
 
 namespace Lumora.Launcher.App.ViewModels;

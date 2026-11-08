@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Lumora.Contracts;
 using Lumora.Launcher.Core.Services;
 using Lumora.Launcher.Core.Settings;
+using Lumora.Shared.Status;
 
 namespace Lumora.Launcher.App.Services.Demo;
 

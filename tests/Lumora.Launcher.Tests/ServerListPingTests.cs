@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Lumora.Launcher.Core.Status;
+using Lumora.Shared.Status;
 
 namespace Lumora.Launcher.Tests;
 

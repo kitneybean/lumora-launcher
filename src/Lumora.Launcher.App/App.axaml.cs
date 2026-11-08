@@ -11,7 +11,7 @@ using Lumora.Launcher.App.Views;
 using Lumora.Launcher.Core.Api;
 using Lumora.Launcher.Core.Game;
 using Lumora.Launcher.Core.Settings;
-using Lumora.Launcher.Core.Status;
+using Lumora.Shared.Status;
 
 namespace Lumora.Launcher.App;
 

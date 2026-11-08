@@ -13,6 +13,7 @@ using Lumora.Launcher.Core.Api;
 using Lumora.Launcher.Core.GameServers;
 using Lumora.Launcher.Core.Services;
 using Lumora.Launcher.Core.Settings;
+using Lumora.Shared.Sync;
 
 namespace Lumora.Launcher.Core.Game;
 

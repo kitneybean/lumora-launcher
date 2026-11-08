@@ -10,10 +10,12 @@
       Override with: dotnet build -p:LumoraContractsProject=path/to/Lumora.Contracts.csproj
     -->
     <LumoraContractsProject Condition="'$(LumoraContractsProject)' == ''">$(MSBuildThisFileDirectory)..\..\..\lumora-auth\src\Lumora.Contracts\Lumora.Contracts.csproj</LumoraContractsProject>
+    <LumoraSharedProject Condition="'$(LumoraSharedProject)' == ''">$(MSBuildThisFileDirectory)..\..\..\lumora-auth\src\Lumora.Shared\Lumora.Shared.csproj</LumoraSharedProject>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(LumoraContractsProject)" />
+    <ProjectReference Include="$(LumoraSharedProject)" />
   </ItemGroup>
 
   <ItemGroup>
