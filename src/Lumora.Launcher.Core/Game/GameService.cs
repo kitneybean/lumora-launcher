@@ -130,15 +130,10 @@ public sealed class GameService(LumoraApiClient api, SettingsStore store, Func<L
         await Task.Run(() => SyncFilesAsync(session, manifest, instance, null, log, ct), ct);
         WriteServerList(buildId, manifest, instance);
         store.SaveInstance(Settings, buildId, instance);
-        var authlib = await EnsureAuthlibInjectorAsync(ct);
-        var metadata = await api.GetYggdrasilMetadataAsync(ct);
-
         var launcher = CreateLauncher(buildId);
         var jvm = new List<MArgument>();
-        foreach (var arg in manifest.JvmArguments.Concat(game.ExtraJvmArguments ?? []))
+        foreach (var arg in manifest.JvmArguments.Concat(game.ExtraJvmArguments ?? []).Concat(await LumoraJvmArgumentsAsync(ct)))
             jvm.Add(new MArgument(arg));
-        jvm.Add(new MArgument($"-javaagent:{authlib}={LoopbackToIPv4(api.YggdrasilUrl)}"));
-        jvm.Add(new MArgument("-Dauthlibinjector.yggdrasil.prefetched=" + Convert.ToBase64String(Encoding.UTF8.GetBytes(metadata))));
 
         var gameArgs = new List<MArgument>();
         if (game.AutoConnect == true || server.AutoConnect)
@@ -166,56 +161,8 @@ public sealed class GameService(LumoraApiClient api, SettingsStore store, Func<L
             option.JavaPath = game.JavaPath;
 
         var process = await launcher.BuildProcessAsync(instance.InstalledVersionName, option, ct);
-        var start = process.StartInfo;
-        start.UseShellExecute = false;
-        start.CreateNoWindow = true;
-        start.RedirectStandardOutput = true;
-        start.RedirectStandardError = true;
-        start.StandardOutputEncoding = Encoding.UTF8;
-        start.StandardErrorEncoding = Encoding.UTF8;
-        start.WorkingDirectory = InstanceDir(buildId);
-        foreach (var (key, value) in game.EnvironmentVariables ?? [])
-            start.Environment[key] = value;
-        start.Environment["INST_DIR"] = InstanceDir(buildId);
-        start.Environment["INST_NAME"] = manifest.Name;
-        start.Environment["INST_JAVA"] = start.FileName;
-        ApplyWrapper(start, game.WrapperCommand);
-
-        if (!string.IsNullOrWhiteSpace(game.PreLaunchCommand))
-        {
-            log($"[Lumora] Команда перед запуском: {game.PreLaunchCommand}");
-            var code = await RunShellAsync(game.PreLaunchCommand, start, log, ct);
-            if (code != 0)
-                throw new InvalidOperationException($"Команда перед запуском завершилась с кодом {code}.");
-        }
-
         log($"[Lumora] {manifest.Name} r{manifest.Revision} · {instance.InstalledVersionName} · {session.PlayerName}");
-        log($"[Lumora] Java: {start.FileName}");
-        process.OutputDataReceived += (_, e) => { if (e.Data is not null) log(e.Data); };
-        process.ErrorDataReceived += (_, e) => { if (e.Data is not null) log(e.Data); };
-        process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-
-        try
-        {
-            await process.WaitForExitAsync(ct);
-        }
-        catch (OperationCanceledException)
-        {
-            log("[Lumora] Остановка игры…");
-            process.Kill(entireProcessTree: true);
-            await process.WaitForExitAsync(CancellationToken.None);
-            throw;
-        }
-
-        var exitCode = process.ExitCode;
-        if (!string.IsNullOrWhiteSpace(game.PostExitCommand))
-        {
-            log($"[Lumora] Команда после выхода: {game.PostExitCommand}");
-            await RunShellAsync(game.PostExitCommand, start, log, CancellationToken.None);
-        }
-        return exitCode;
+        return await GameRuntime.RunAsync(process, InstanceDir(buildId), manifest.Name, game, log, ct);
     }
 
     // ------------------------------------------------------------------ files
@@ -302,6 +249,18 @@ public sealed class GameService(LumoraApiClient api, SettingsStore store, Func<L
         instance.ManagedServerAddresses = entries.Select(e => e.Address).ToList();
     }
 
+    /// <summary>JVM arguments that make the game use Lumora accounts and skins (authlib-injector).</summary>
+    public async Task<IReadOnlyList<string>> LumoraJvmArgumentsAsync(CancellationToken ct)
+    {
+        var authlib = await EnsureAuthlibInjectorAsync(ct);
+        var metadata = await api.GetYggdrasilMetadataAsync(ct);
+        return
+        [
+            $"-javaagent:{authlib}={LoopbackToIPv4(api.YggdrasilUrl)}",
+            "-Dauthlibinjector.yggdrasil.prefetched=" + Convert.ToBase64String(Encoding.UTF8.GetBytes(metadata)),
+        ];
+    }
+
     /// <summary>Downloads authlib-injector from the auth server once per version; returns the jar path.</summary>
     private async Task<string> EnsureAuthlibInjectorAsync(CancellationToken ct)
     {
@@ -332,20 +291,7 @@ public sealed class GameService(LumoraApiClient api, SettingsStore store, Func<L
 
     private string InstanceDir(Guid buildId) => Paths.InstanceDirectory(Settings, buildId);
 
-    private MinecraftLauncher CreateLauncher(Guid buildId)
-    {
-        var shared = Paths.SharedDirectory(Settings);
-        var path = new MinecraftPath(InstanceDir(buildId))
-        {
-            Library = Path.Combine(shared, "libraries"),
-            Versions = Path.Combine(shared, "versions"),
-            Assets = Path.Combine(shared, "assets"),
-            Runtime = Path.Combine(shared, "runtime"),
-            Resource = Path.Combine(shared, "resources"),
-        };
-        path.CreateDirs();
-        return new MinecraftLauncher(path);
-    }
+    private MinecraftLauncher CreateLauncher(Guid buildId) => GameRuntime.CreateLauncher(Paths, Settings, InstanceDir(buildId));
 
     private void SaveManifest(Guid buildId, BuildManifestDto manifest)
     {
@@ -375,107 +321,4 @@ public sealed class GameService(LumoraApiClient api, SettingsStore store, Func<L
         return Convert.ToHexStringLower(SHA256.HashData(stream));
     }
 
-    /// <summary>"gamemoderun" or "prime-run": runs java through the wrapper.</summary>
-    private static void ApplyWrapper(ProcessStartInfo start, string? wrapper)
-    {
-        if (string.IsNullOrWhiteSpace(wrapper))
-            return;
-        var parts = wrapper.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        var originalArgs = start.Arguments;
-        var java = start.FileName;
-        start.FileName = parts[0];
-        start.Arguments = (parts.Length > 1 ? parts[1] + " " : "") + Quote(java) + " " + originalArgs;
-    }
-
-    private static string Quote(string s) => s.Contains(' ') ? $"\"{s}\"" : s;
-
-    private static async Task<int> RunShellAsync(string command, ProcessStartInfo game, Action<string> log, CancellationToken ct)
-    {
-        var start = OperatingSystem.IsWindows()
-            ? new ProcessStartInfo("cmd.exe", ["/c", command])
-            : new ProcessStartInfo("/bin/sh", ["-c", command]);
-        start.UseShellExecute = false;
-        start.CreateNoWindow = true;
-        start.RedirectStandardOutput = true;
-        start.RedirectStandardError = true;
-        start.WorkingDirectory = game.WorkingDirectory;
-        foreach (var key in new[] { "INST_DIR", "INST_NAME", "INST_JAVA" })
-            start.Environment[key] = game.Environment[key];
-
-        using var process = new Process { StartInfo = start };
-        process.OutputDataReceived += (_, e) => { if (e.Data is not null) log(e.Data); };
-        process.ErrorDataReceived += (_, e) => { if (e.Data is not null) log(e.Data); };
-        process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-        await process.WaitForExitAsync(ct);
-        return process.ExitCode;
-    }
-
-    /// <summary>Maps CmlLib file/byte events to one overall progress bar with stage weights, throttled.</summary>
-    private sealed class StageReporter(IProgress<InstallProgress> target)
-    {
-        private string _stage = "";
-        private double _start, _weight;
-        private long _lastReport;
-        private long _bytesTotal;
-        private readonly Stopwatch _clock = Stopwatch.StartNew();
-        private long _stageStartMs;
-
-        public IProgress<InstallerProgressChangedEventArgs> Files { get; private set; } = null!;
-        public IProgress<ByteProgress> Bytes { get; private set; } = null!;
-
-        public void Begin(string stage, double start, double weight)
-        {
-            _stage = stage;
-            _start = start;
-            _weight = weight;
-            _bytesTotal = 0;
-            _stageFraction = 0;
-            _stageStartMs = _clock.ElapsedMilliseconds;
-            Files = new SyncProgress<InstallerProgressChangedEventArgs>(e =>
-            {
-                if (e.TotalTasks > 0)
-                    Report((double)e.ProgressedTasks / e.TotalTasks, $"{e.ProgressedTasks}/{e.TotalTasks} файлов", force: e.ProgressedTasks == e.TotalTasks);
-            });
-            Bytes = new SyncProgress<ByteProgress>(b =>
-            {
-                if (b.TotalBytes > 0)
-                    ReportBytes(b.ProgressedBytes, b.TotalBytes);
-            });
-            target.Report(new InstallProgress(stage, start));
-        }
-
-        public void SetBytesTotal(long total) => _bytesTotal = total;
-
-        public void ReportBytes(long done, long total)
-        {
-            total = Math.Max(total, _bytesTotal);
-            if (total <= 0)
-                return;
-            var seconds = Math.Max(0.5, (_clock.ElapsedMilliseconds - _stageStartMs) / 1000.0);
-            var speed = done / seconds / 1024 / 1024;
-            Report((double)done / total, $"{done / 1024.0 / 1024:0.0} из {total / 1024.0 / 1024:0.0} МБ · {speed:0.0} МБ/с", done >= total);
-        }
-
-        private double _stageFraction;
-
-        private void Report(double fraction, string detail, bool force)
-        {
-            // File and byte events both drive the bar: never let it move backwards within a stage.
-            fraction = Math.Max(Math.Clamp(fraction, 0, 1), _stageFraction);
-            _stageFraction = fraction;
-            var now = _clock.ElapsedMilliseconds;
-            if (!force && now - Interlocked.Read(ref _lastReport) < 120)
-                return;
-            Interlocked.Exchange(ref _lastReport, now);
-            target.Report(new InstallProgress(_stage, _start + Math.Clamp(fraction, 0, 1) * _weight, detail));
-        }
-    }
-
-    /// <summary>IProgress that calls back synchronously (CmlLib reports from worker threads).</summary>
-    private sealed class SyncProgress<T>(Action<T> action) : IProgress<T>
-    {
-        public void Report(T value) => action(value);
-    }
 }

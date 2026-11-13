@@ -14,10 +14,16 @@ using Lumora.Launcher.Core.Settings;
 string Arg(string name, string? fallback = null) =>
     args.SkipWhile(a => a != name).Skip(1).FirstOrDefault() ?? fallback ?? throw new ArgumentException($"Missing {name}");
 
-var server = Arg("--server");
 var dataDir = Arg("--data", Path.Combine(Path.GetTempPath(), "lumora-smoke"));
 var seconds = int.Parse(Arg("--seconds", "180"));
 var keepRunning = args.Contains("--keep-running");
+
+// --custom fabric:1.21.1 | neoforge:1.21.1 | vanilla:1.21.1  [--nick Steve] [--mods sodium,iris]
+// The player's own build: create, install, add mods from Modrinth, start offline, stop at the main menu.
+if (args.Contains("--custom"))
+    return await CustomSmoke.RunAsync(Arg("--custom"), Arg("--nick", "Smoke"), Arg("--mods", ""), dataDir, seconds, keepRunning);
+
+var server = Arg("--server");
 // --join: the build's server must have "auto-connect" on; wait until the player is in the world.
 var join = args.Contains("--join");
 var joined = false;
