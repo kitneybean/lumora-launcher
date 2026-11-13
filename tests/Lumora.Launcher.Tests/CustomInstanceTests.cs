@@ -111,3 +111,28 @@ public sealed class CustomInstanceStoreTests : IDisposable
 
     public void Dispose() => Directory.Delete(_root, true);
 }
+
+public sealed class AccountStoreTests : IDisposable
+{
+    private readonly string _dir = Directory.CreateTempSubdirectory("lumora-accounts").FullName;
+
+    [Fact]
+    public void Offline_and_microsoft_accounts_persist_with_the_active_one()
+    {
+        var file = Path.Combine(_dir, "accounts.json");
+        var store = new AccountStore(file);
+        var steve = store.AddOffline("Steve");
+        Assert.Same(steve, store.AddOffline("steve")); // no duplicates
+        Assert.Throws<ArgumentException>(() => store.AddOffline("x"));
+        var ms = store.UpsertMicrosoft("Notch", "069a79f444e94726a5befca90e38aaf5");
+        store.SetActive(ms.Id);
+
+        var reloaded = new AccountStore(file);
+        Assert.Equal(2, reloaded.Accounts.Count);
+        Assert.Equal("Notch", reloaded.Active!.Name);
+        reloaded.Remove(ms.Id);
+        Assert.Null(reloaded.Active); // back to the Lumora account
+    }
+
+    public void Dispose() => Directory.Delete(_dir, true);
+}
