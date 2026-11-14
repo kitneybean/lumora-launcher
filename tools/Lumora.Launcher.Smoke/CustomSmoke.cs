@@ -78,9 +78,29 @@ internal static class CustomSmoke
     }
 }
 
-/// <summary>Filled in once the content catalog exists.</summary>
+/// <summary>Installs Modrinth projects by slug ("shader:complementary-reimagined" for a shader pack).</summary>
 internal static class ContentSmoke
 {
-    public static Task AddModsAsync(HttpClient http, CustomInstanceStore store, CustomInstance instance, string[] slugs) =>
-        throw new NotSupportedException("--mods появится вместе с каталогом Modrinth.");
+    public static async Task AddModsAsync(HttpClient http, CustomInstanceStore store, CustomInstance instance, string[] slugs)
+    {
+        var modrinth = new Lumora.Launcher.Core.Content.ModrinthProvider(http);
+        var installer = new Lumora.Launcher.Core.Content.ContentInstaller(http, store, [modrinth]);
+        foreach (var item in slugs)
+        {
+            var kind = item.StartsWith("shader:") ? ContentKind.Shader : item.StartsWith("pack:") ? ContentKind.ResourcePack : ContentKind.Mod;
+            var slug = item.Contains(':') ? item[(item.IndexOf(':') + 1)..] : item;
+            var result = await installer.InstallAsync(instance, ContentSource.Modrinth, slug, kind, progress: new Note());
+            foreach (var e in result.Added)
+                Console.WriteLine($"[content] + {e.Kind} {e.Title} {e.VersionNumber} ({e.FileName}){(e.IsDependency ? " dependency" : "")}");
+            foreach (var n in result.Notes)
+                Console.WriteLine($"[content] ! {n}");
+        }
+        var updates = await installer.CheckUpdatesAsync(instance);
+        Console.WriteLine($"[content] updates available: {updates.Count}");
+    }
+
+    private sealed class Note : IProgress<string>
+    {
+        public void Report(string value) => Console.WriteLine("[content] … " + value);
+    }
 }

@@ -136,3 +136,21 @@ public sealed class AccountStoreTests : IDisposable
 
     public void Dispose() => Directory.Delete(_dir, true);
 }
+
+public class Log4jXmlReaderTests
+{
+    [Fact]
+    public void Xml_events_become_plain_lines()
+    {
+        var lines = new List<string>();
+        var reader = new Lumora.Launcher.Core.Game.Log4jXmlReader(lines.Add);
+        reader.Line("plain line");
+        reader.Line("""<log4j:Event logger="Iris" timestamp="1794623418103" level="INFO" thread="Render thread">""");
+        reader.Line("""  <log4j:Message><![CDATA[Loading 16 mods:""");
+        reader.Line("""  - sodium 0.8.13]]></log4j:Message>""");
+        reader.Line("""</log4j:Event>""");
+        Assert.Equal("plain line", lines[0]);
+        Assert.Matches(@"^\[\d\d:\d\d:\d\d\] \[Render thread/INFO\] \[Iris\]: Loading 16 mods:$", lines[1]);
+        Assert.Equal("  - sodium 0.8.13", lines[2]);
+    }
+}

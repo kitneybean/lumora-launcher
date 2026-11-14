@@ -57,7 +57,8 @@ public static class GameRuntime
         }
 
         log($"[Lumora] Java: {start.FileName}");
-        process.OutputDataReceived += (_, e) => { if (e.Data is not null) log(e.Data); };
+        var output = new Log4jXmlReader(log);
+        process.OutputDataReceived += (_, e) => { if (e.Data is not null) output.Line(e.Data); };
         process.ErrorDataReceived += (_, e) => { if (e.Data is not null) log(e.Data); };
         process.Start();
         process.BeginOutputReadLine();
@@ -191,4 +192,59 @@ public sealed class StageReporter(IProgress<InstallProgress> target)
 public sealed class SyncProgress<T>(Action<T> action) : IProgress<T>
 {
     public void Report(T value) => action(value);
+}
+
+/// <summary>
+/// Vanilla and Fabric print the game log as log4j XML events (meant for launchers). Turns each event into the
+/// usual "[time] [thread/LEVEL] [logger]: message" line; other lines pass through unchanged.
+/// </summary>
+public sealed partial class Log4jXmlReader(Action<string> log)
+{
+    private readonly object _gate = new();
+    private System.Text.StringBuilder? _event;
+
+    [System.Text.RegularExpressions.GeneratedRegex("(\\w+)=\"([^\"]*)\"")]
+    private static partial System.Text.RegularExpressions.Regex Attributes();
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"<!\[CDATA\[(.*?)\]\]>", System.Text.RegularExpressions.RegexOptions.Singleline)]
+    private static partial System.Text.RegularExpressions.Regex Cdata();
+
+    public void Line(string line)
+    {
+        lock (_gate)
+        {
+            var trimmed = line.TrimStart();
+            if (_event is null && !trimmed.StartsWith("<log4j:Event", StringComparison.Ordinal))
+            {
+                log(line);
+                return;
+            }
+            _event ??= new System.Text.StringBuilder();
+            _event.AppendLine(line);
+            if (!trimmed.StartsWith("</log4j:Event>", StringComparison.Ordinal))
+                return;
+            var text = _event.ToString();
+            _event = null;
+            foreach (var formatted in Format(text))
+                log(formatted);
+        }
+    }
+
+    public static IEnumerable<string> Format(string xmlEvent)
+    {
+        var header = xmlEvent[..Math.Max(0, xmlEvent.IndexOf('>'))];
+        var attrs = Attributes().Matches(header).ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
+        var time = attrs.TryGetValue("timestamp", out var ts) && long.TryParse(ts, out var ms)
+            ? DateTimeOffset.FromUnixTimeMilliseconds(ms).ToLocalTime().ToString("HH:mm:ss")
+            : "";
+        var prefix = $"[{time}] [{attrs.GetValueOrDefault("thread")}/{attrs.GetValueOrDefault("level")}] [{attrs.GetValueOrDefault("logger")}]: ";
+        var blocks = Cdata().Matches(xmlEvent).Select(m => m.Groups[1].Value).ToList();
+        if (blocks.Count == 0)
+            yield break;
+        var lines = blocks[0].Replace("\r", "").Split('\n');
+        yield return prefix + lines[0];
+        foreach (var rest in lines.Skip(1).Concat(blocks.Skip(1).SelectMany(b => b.Replace("\r", "").Split('\n'))))
+            if (rest.Length > 0)
+                yield return rest;
+    }
 }
