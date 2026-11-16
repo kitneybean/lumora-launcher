@@ -100,6 +100,9 @@
                                                 <TextBlock Text="{Binding ModsText}" />
                                             </StackPanel>
                                         </Border>
+                                        <Border Classes="pill warning" IsVisible="{Binding ModsErrorText, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            <TextBlock Text="{Binding ModsErrorText}" />
+                                        </Border>
                                         <Border Classes="pill warning" IsVisible="{Binding NeedsUpdate}">
                                             <TextBlock Text="Есть обновление" />
                                         </Border>

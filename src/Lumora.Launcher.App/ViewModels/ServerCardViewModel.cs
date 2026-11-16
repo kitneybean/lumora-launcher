@@ -86,6 +86,9 @@ public partial class ServerCardViewModel : ViewModelBase
     [ObservableProperty]
     public partial string? ModsText { get; set; }
 
+    [ObservableProperty]
+    public partial string? ModsErrorText { get; set; }
+
     // --- Live status ---
 
     [ObservableProperty]
@@ -98,6 +101,7 @@ public partial class ServerCardViewModel : ViewModelBase
     public string StatusText => Status switch
     {
         null => "Проверка…",
+        { IsUnknown: true } => "Статус недоступен",
         { IsOnline: false } => "Не в сети",
         var s => $"{s.Players} / {s.MaxPlayers} · {s.PingMs} мс",
     };
@@ -146,30 +150,59 @@ public partial class ServerCardViewModel : ViewModelBase
         _ => MaterialIconKind.Play,
     };
 
-    public async Task LoadDetailsAsync()
+    public async Task LoadDetailsAsync(CancellationToken ct = default)
     {
-        var statusTask = _services.Status.GetStatusAsync(Dto.Address, Dto.Port);
+        var manifestTask = LoadManifestAsync(ct);
+        var statusTask = LoadStatusAsync(ct);
         try
         {
-            Manifest = await _services.Api.GetManifestAsync(_shell.Session, Dto.Build.Id);
-            var mods = Manifest.Files.Count(f => f.Path.StartsWith("mods/", StringComparison.Ordinal));
-            ModsText = mods > 0 ? Text.Plural(mods, "мод", "мода", "модов") : null;
+            await Task.WhenAll(manifestTask, statusTask);
         }
-        catch (Exception)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            ModsText = null;
+            return;
         }
 
+        OnPropertyChanged(nameof(IsOnline));
+        _statusChanged();
+    }
+
+    private async Task LoadManifestAsync(CancellationToken ct)
+    {
         try
         {
-            Status = await statusTask;
+            var manifest = await _services.Api.GetManifestAsync(_shell.Session, Dto.Build.Id, ct);
+            Manifest = manifest;
+            var mods = manifest.Files.Count(f => f.Path.StartsWith("mods/", StringComparison.Ordinal));
+            ModsText = mods > 0 ? Text.Plural(mods, "мод", "мода", "модов") : null;
+            ModsErrorText = null;
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
         }
         catch (Exception)
         {
-            Status = ServerStatus.Offline;
+            Manifest = null;
+            ModsText = null;
+            ModsErrorText = "Состав недоступен";
         }
-        OnPropertyChanged(nameof(IsOnline));
-        _statusChanged();
+    }
+
+    private async Task LoadStatusAsync(CancellationToken ct)
+    {
+        try
+        {
+            Status = await _services.Status.GetStatusAsync(Dto.Address, Dto.Port, ct);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+            Status = ServerStatus.Unknown;
+        }
     }
 
     [RelayCommand]

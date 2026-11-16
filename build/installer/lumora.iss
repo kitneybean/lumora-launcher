@@ -3,7 +3,7 @@
 ; adds Start menu and desktop shortcuts and an entry in "Apps & features".
 ; The launcher keeps updating itself in this folder from GitHub Releases; settings and games stay in %AppData%\Lumora.
 ;
-; Build: ISCC.exe /DAppVersion=0.1.3 /DSourceDir=<publish dir> /DOutputDir=<dir> build\installer\lumora.iss
+; Build: ISCC.exe /DAppVersion=0.2.0 /DSourceDir=<publish dir> /DOutputDir=<dir> build\installer\lumora.iss
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"

@@ -11,7 +11,7 @@
             <SolidColorBrush x:Key="Lumora.BorderStrong" Color="#343B47" />
             <SolidColorBrush x:Key="Lumora.Text" Color="#E9ECF1" />
             <SolidColorBrush x:Key="Lumora.TextSecondary" Color="#9AA3B2" />
-            <SolidColorBrush x:Key="Lumora.TextMuted" Color="#667080" />
+            <SolidColorBrush x:Key="Lumora.TextMuted" Color="#9AA3B2" />
             <SolidColorBrush x:Key="Lumora.Accent" Color="#3DD68C" />
             <SolidColorBrush x:Key="Lumora.AccentHover" Color="#5CE3A2" />
             <SolidColorBrush x:Key="Lumora.AccentPressed" Color="#2CB775" />
@@ -48,7 +48,7 @@
             <SolidColorBrush x:Key="Lumora.BorderStrong" Color="#C9CFD8" />
             <SolidColorBrush x:Key="Lumora.Text" Color="#14171C" />
             <SolidColorBrush x:Key="Lumora.TextSecondary" Color="#566070" />
-            <SolidColorBrush x:Key="Lumora.TextMuted" Color="#8A93A1" />
+            <SolidColorBrush x:Key="Lumora.TextMuted" Color="#687383" />
             <SolidColorBrush x:Key="Lumora.Accent" Color="#18A35E" />
             <SolidColorBrush x:Key="Lumora.AccentHover" Color="#14B266" />
             <SolidColorBrush x:Key="Lumora.AccentPressed" Color="#118A4F" />

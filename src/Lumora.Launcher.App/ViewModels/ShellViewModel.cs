@@ -37,8 +37,8 @@ public partial class ShellViewModel : ViewModelBase
             new("Настройки", MaterialIconKind.CogOutline, Settings),
             new("Консоль", MaterialIconKind.Console, Console),
         ];
-        SelectedNav = NavItems[0];
         CurrentPage = Servers;
+        SelectedNav = NavItems[0];
 
         _ = LoadSkinAsync();
     }
@@ -83,12 +83,20 @@ public partial class ShellViewModel : ViewModelBase
     partial void OnSelectedNavChanged(NavItem? value)
     {
         if (value is not null)
+        {
+            if (CurrentPage == Servers && value.Page != Servers)
+                Servers.Deactivate();
             CurrentPage = value.Page;
+            if (value.Page == Servers)
+                Servers.Activate();
+        }
     }
 
     /// <summary>Opens a page that is not in the sidebar (e.g. build settings).</summary>
     public void OpenSubPage(ViewModelBase page)
     {
+        if (CurrentPage == Servers)
+            Servers.Deactivate();
         SelectedNav = null;
         CurrentPage = page;
     }
@@ -131,6 +139,7 @@ public partial class ShellViewModel : ViewModelBase
     [RelayCommand]
     private async Task LogoutAsync()
     {
+        Servers.Deactivate();
         try
         {
             await _services.Api.LogoutAsync(Session);
