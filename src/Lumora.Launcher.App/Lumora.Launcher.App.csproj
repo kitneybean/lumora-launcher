@@ -8,7 +8,7 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>Lumora</AssemblyName>
     <RootNamespace>Lumora.Launcher.App</RootNamespace>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <ApplicationIcon>Assets/lumora.ico</ApplicationIcon>
   </PropertyGroup>
 
